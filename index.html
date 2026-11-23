@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>idk — Play Games</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #111827; color: #f9fafb; min-height: 100vh; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 48px; text-align: center; }
+  h1 { font-size: 2.2rem; margin: 8px 0 4px; }
+  p.sub { color: #9ca3af; margin: 0 0 24px; }
+  .menu { display: grid; gap: 14px; }
+  .card { background: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 20px; text-align: left; cursor: pointer; }
+  .card:hover { border-color: #60a5fa; }
+  .card .emoji { font-size: 2rem; }
+  .card h2 { margin: 8px 0 4px; font-size: 1.25rem; }
+  .card p { margin: 0; color: #9ca3af; }
+  .hidden { display: none !important; }
+  button { background: #2563eb; color: white; border: 0; border-radius: 999px; padding: 12px 20px; font-size: 1rem; cursor: pointer; margin: 6px 4px; }
+  button.secondary { background: #374151; }
+  button:disabled { opacity: .5; cursor: default; }
+  .back { background: transparent; border: 1px solid #4b5563; color: #e5e7eb; }
+  .score { font-size: 1.1rem; margin: 10px 0; color: #fbbf24; }
+  canvas { background: #000; border-radius: 12px; max-width: 100%; height: auto; touch-action: none; }
+  .pad { display: grid; grid-template-columns: repeat(3, 64px); gap: 6px; justify-content: center; margin: 14px auto 0; }
+  .pad button { margin: 0; padding: 12px 0; background: #374151; }
+  /* Tic-tac-toe */
+  .board { display: grid; grid-template-columns: repeat(3, 96px); gap: 8px; justify-content: center; margin: 16px auto; }
+  .cell { width: 96px; height: 96px; background: #1f2937; border: 1px solid #374151; border-radius: 12px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  /* Memory */
+  .memory { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 420px; margin: 16px auto; }
+  .mcard { aspect-ratio: 1; background: #1f2937; border: 1px solid #374151; border-radius: 10px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .mcard.flipped, .mcard.matched { background: #2563eb; }
+  .mcard.matched { opacity: .55; cursor: default; }
+  .status { min-height: 1.5em; color: #9ca3af; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="menu">
+    <h1>🎮 idk</h1>
+    <p class="sub">Pick a game — all three are right here.</p>
+    <div class="menu">
+      <div class="card" onclick="showGame('snake')"><div class="emoji">🐍</div><h2>Snake</h2><p>Eat the food, grow longer, don't hit the wall or yourself. Arrow keys, swipe, or the buttons.</p></div>
+      <div class="card" onclick="showGame('ttt')"><div class="emoji">❌⭕</div><h2>Tic-Tac-Toe</h2><p>Play against the computer, or pass-and-play with a friend.</p></div>
+      <div class="card" onclick="showGame('memory')"><div class="emoji">🃏</div><h2>Memory Match</h2><p>Flip cards and find all 8 pairs in as few moves as you can.</p></div>
+    </div>
+    <p class="sub" style="margin-top:24px">Made for jordanIsCool-glitch/idk</p>
+  </div>
+
+  <!-- Snake -->
+  <div id="snake" class="hidden">
+    <h1>🐍 Snake</h1>
+    <div class="score" id="snakeScore">Score: 0</div>
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+    <div><button onclick="startSnake()">Start / Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
+    <div class="pad">
+      <span></span><button onclick="setDir(0,-1)">↑</button><span></span>
+      <button onclick="setDir(-1,0)">←</button><button onclick="setDir(0,1)">↓</button><button onclick="setDir(1,0)">→</button>
+    </div>
+    <p class="status" id="snakeStatus">Press Start, then use arrow keys, swipe, or the buttons.</p>
+  </div>
+
+  <!-- Tic-tac-toe -->
+  <div id="ttt" class="hidden">
+    <h1>❌⭕ Tic-Tac-Toe</h1>
+    <div><button id="modeBtn" onclick="toggleMode()">Mode: vs Computer</button></div>
+    <div class="status" id="tttStatus">Your turn — you're X</div>
+    <div class="board" id="tttBoard"></div>
+    <div><button onclick="resetTTT()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
+  </div>
+
+  <!-- Memory -->
+  <div id="memory" class="hidden">
+    <h1>🃏 Memory Match</h1>
+    <div class="score" id="memoryScore">Moves: 0 &nbsp;•&nbsp; Pairs: 0 / 8</div>
+    <div class="memory" id="memoryBoard"></div>
+    <div class="status" id="memoryStatus">Flip two cards to find a pair.</div>
+    <div><button onclick="startMemory()">Shuffle &amp; Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
+  </div>
+</div>
+
+<script>
+function showMenu(){ ['snake','ttt','memory'].forEach(id=>document.getElementById(id).classList.add('hidden')); document.getElementById('menu').classList.remove('hidden'); stopSnake(); }
+function showGame(id){ document.getElementById('menu').classList.add('hidden'); ['snake','ttt','memory'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='ttt') resetTTT(); if(id==='memory') startMemory(); if(id==='snake') drawSnake(); window.scrollTo(0,0); }
+
+/* --- Snake --- */
+const canvas=document.getElementById('snakeCanvas'), ctx=canvas.getContext('2d');
+let snake, dir, food, score, snakeTimer=null, snakeRunning=false;
+function drawSnake(){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,400,400);
+  ctx.fillStyle='#ef4444'; ctx.fillRect(food.x*20, food.y*20, 20, 20);
+  snake.forEach((s,i)=>{ ctx.fillStyle=i===0?'#22c55e':'#16a34a'; ctx.fillRect(s.x*20, s.y*20, 19, 19); });
+}
+function placeFood(){ food={x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)}; }
+function startSnake(){
+  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; dir={x:1,y:0}; score=0; placeFood(); snakeRunning=true;
+  document.getElementById('snakeScore').textContent='Score: 0';
+  document.getElementById('snakeStatus').textContent='Playing — good luck!';
+  clearInterval(snakeTimer); snakeTimer=setInterval(tickSnake, 130); drawSnake();
+}
+function stopSnake(){ snakeRunning=false; clearInterval(snakeTimer); }
+function setDir(x,y){ if(!snakeRunning) return; if(x===-dir.x && y===-dir.y) return; dir={x,y}; }
+function tickSnake(){
+  const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+  if(head.x<0||head.y<0||head.x>=20||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)){
+    stopSnake(); document.getElementById('snakeStatus').textContent='Game over! Score: '+score+'. Press Start to play again.'; return;
+  }
+  snake.unshift(head);
+  if(head.x===food.x&&head.y===food.y){ score+=10; document.getElementById('snakeScore').textContent='Score: '+score; placeFood(); }
+  else snake.pop();
+  drawSnake();
+}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('snake').classList.contains('hidden')) return;
+  if(e.key==='ArrowUp') setDir(0,-1); if(e.key==='ArrowDown') setDir(0,1);
+  if(e.key==='ArrowLeft') setDir(-1,0); if(e.key==='ArrowRight') setDir(1,0);
+});
+let touchX=0, touchY=0;
+canvas.addEventListener('touchstart',e=>{ touchX=e.touches[0].clientX; touchY=e.touches[0].clientY; },{passive:true});
+canvas.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchX, dy=e.changedTouches[0].clientY-touchY;
+  if(Math.abs(dx)>Math.abs(dy)) setDir(dx>0?1:-1,0); else setDir(0,dy>0?1:-1);
+},{passive:true});
+snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; food={x:15,y:10}; drawSnake();
+
+/* --- Tic-tac-toe --- */
+let tttBoard, tttTurn, tttOver, vsComputer=true;
+function toggleMode(){ vsComputer=!vsComputer; document.getElementById('modeBtn').textContent='Mode: '+(vsComputer?'vs Computer':'2 Players'); resetTTT(); }
+function resetTTT(){
+  tttBoard=Array(9).fill(''); tttTurn='X'; tttOver=false;
+  document.getElementById('tttStatus').textContent=vsComputer?'Your turn — you\'re X':'Player X\'s turn';
+  const b=document.getElementById('tttBoard'); b.innerHTML='';
+  tttBoard.forEach((_,i)=>{ const c=document.createElement('div'); c.className='cell'; c.onclick=()=>tttMove(i); b.appendChild(c); });
+}
+function tttMove(i){
+  if(tttOver||tttBoard[i]) return;
+  tttBoard[i]=tttTurn; renderTTT();
+  const w=tttWinner(); if(w){ endTTT(w); return; }
+  if(tttBoard.every(Boolean)){ endTTT('draw'); return; }
+  tttTurn=tttTurn==='X'?'O':'X';
+  document.getElementById('tttStatus').textContent=vsComputer?(tttTurn==='X'?'Your turn — you\'re X':'Computer is thinking…'):'Player '+tttTurn+'\'s turn';
+  if(vsComputer&&tttTurn==='O') setTimeout(computerMove, 400);
+}
+function computerMove(){
+  if(tttOver) return;
+  const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
+  const pick=empty[Math.floor(Math.random()*empty.length)];
+  tttMove(pick);
+}
+function renderTTT(){ document.querySelectorAll('#tttBoard .cell').forEach((c,i)=>c.textContent=tttBoard[i]); }
+function tttWinner(){
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const [a,b,c] of lines) if(tttBoard[a]&&tttBoard[a]===tttBoard[b]&&tttBoard[a]===tttBoard[c]) return tttBoard[a];
+  return null;
+}
+function endTTT(w){
+  tttOver=true;
+  document.getElementById('tttStatus').textContent=w==='draw'?'It\'s a draw!':(w==='X'?'X wins! 🎉':'O wins! 🎉');
+}
+
+/* --- Memory --- */
+const EMOJIS=['🍎','🚀','🐶','🌈','⚽','🎵','🌙','🍕'];
+let memCards, memFlipped, memMatched, memMoves, memLock;
+function startMemory(){
+  const deck=[...EMOJIS,...EMOJIS].sort(()=>Math.random()-0.5);
+  memCards=deck; memFlipped=[]; memMatched=0; memMoves=0; memLock=false;
+  document.getElementById('memoryScore').textContent='Moves: 0  •  Pairs: 0 / 8';
+  document.getElementById('memoryStatus').textContent='Flip two cards to find a pair.';
+  const b=document.getElementById('memoryBoard'); b.innerHTML='';
+  deck.forEach((emoji,i)=>{
+    const c=document.createElement('div'); c.className='mcard'; c.textContent='?'; c.dataset.emoji=emoji; c.dataset.index=i;
+    c.onclick=()=>flipCard(c); b.appendChild(c);
+  });
+}
+function flipCard(card){
+  if(memLock||card.classList.contains('flipped')||card.classList.contains('matched')) return;
+  card.classList.add('flipped'); card.textContent=card.dataset.emoji; memFlipped.push(card);
+  if(memFlipped.length===2){
+    memMoves++; memLock=true;
+    const [a,b]=memFlipped;
+    if(a.dataset.emoji===b.dataset.emoji){
+      setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); memMatched++; memFlipped=[]; memLock=false;
+        document.getElementById('memoryScore').textContent='Moves: '+memMoves+'  •  Pairs: '+memMatched+' / 8';
+        if(memMatched===8) document.getElementById('memoryStatus').textContent='You found them all in '+memMoves+' moves! 🎉';
+      }, 300);
+    } else {
+      setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); a.textContent='?'; b.textContent='?'; memFlipped=[]; memLock=false;
+        document.getElementById('memoryScore').textContent='Moves: '+memMoves+'  •  Pairs: '+memMatched+' / 8';
+      }, 700);
+    }
+  }
+}
+startMemory();
+</script>
+</body>
+</html>
