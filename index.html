@@ -3,196 +3,501 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>idk — Play Games</title>
+<title>idk — 50 Games &amp; Apps</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #111827; color: #f9fafb; min-height: 100vh; }
   .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 48px; text-align: center; }
-  h1 { font-size: 2.2rem; margin: 8px 0 4px; }
+  h1 { font-size: 2rem; margin: 8px 0 4px; }
   p.sub { color: #9ca3af; margin: 0 0 24px; }
-  .menu { display: grid; gap: 14px; }
-  .card { background: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 20px; text-align: left; cursor: pointer; }
+  .menu { display: grid; gap: 12px; }
+  .card { background: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 16px; text-align: left; cursor: pointer; position: relative; }
   .card:hover { border-color: #60a5fa; }
-  .card .emoji { font-size: 2rem; }
-  .card h2 { margin: 8px 0 4px; font-size: 1.25rem; }
-  .card p { margin: 0; color: #9ca3af; }
+  .card .emoji { font-size: 1.8rem; }
+  .card h2 { margin: 6px 0 4px; font-size: 1.15rem; }
+  .card p { margin: 0; color: #9ca3af; font-size: .95rem; }
+  .num { position: absolute; top: 10px; right: 12px; color: #6b7280; font-size: .85rem; font-weight: bold; }
   .hidden { display: none !important; }
-  button { background: #2563eb; color: white; border: 0; border-radius: 999px; padding: 12px 20px; font-size: 1rem; cursor: pointer; margin: 6px 4px; }
+  .app { text-align: center; }
+  button { background: #2563eb; color: white; border: 0; border-radius: 999px; padding: 12px 20px; font-size: 1rem; cursor: pointer; margin: 6px 4px; min-height: 44px; }
   button.secondary { background: #374151; }
   button:disabled { opacity: .5; cursor: default; }
-  .back { background: transparent; border: 1px solid #4b5563; color: #e5e7eb; }
   .score { font-size: 1.1rem; margin: 10px 0; color: #fbbf24; }
   canvas { background: #000; border-radius: 12px; max-width: 100%; height: auto; touch-action: none; }
   .pad { display: grid; grid-template-columns: repeat(3, 64px); gap: 6px; justify-content: center; margin: 14px auto 0; }
   .pad button { margin: 0; padding: 12px 0; background: #374151; }
-  /* Tic-tac-toe */
   .board { display: grid; grid-template-columns: repeat(3, 96px); gap: 8px; justify-content: center; margin: 16px auto; }
   .cell { width: 96px; height: 96px; background: #1f2937; border: 1px solid #374151; border-radius: 12px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  /* Memory */
   .memory { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 420px; margin: 16px auto; }
   .mcard { aspect-ratio: 1; background: #1f2937; border: 1px solid #374151; border-radius: 10px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .mcard.flipped, .mcard.matched { background: #2563eb; }
   .mcard.matched { opacity: .55; cursor: default; }
   .status { min-height: 1.5em; color: #9ca3af; margin: 8px 0; }
+  input, textarea, select { background: #1f2937; color: #f9fafb; border: 1px solid #4b5563; border-radius: 10px; padding: 12px; font-size: 1rem; margin: 4px; width: 90%; max-width: 320px; }
+  input[type=number], input[type=text] { text-align: center; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 420px; margin: 12px auto; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 420px; margin: 12px auto; }
+  .grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 420px; margin: 12px auto; }
+  .tile { aspect-ratio: 1; background: #1f2937; border: 1px solid #374151; border-radius: 10px; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; min-height: 44px; }
+  .tile.on { background: #fbbf24; color: #111; }
+  .tile.sel { outline: 3px solid #60a5fa; }
+  .big { font-size: 3rem; margin: 12px 0; }
+  .keys { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 12px 0; }
+  .keys button { padding: 10px 14px; margin: 2px; }
+  .calc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 320px; margin: 12px auto; }
+  .calc button { margin: 0; }
+  .quizopt { display: block; width: 100%; max-width: 420px; margin: 6px auto; background: #1f2937; }
+  .piano { display: flex; justify-content: center; gap: 4px; margin: 16px 0; flex-wrap: wrap; }
+  .piano button { background: #f9fafb; color: #111; padding: 40px 10px 10px; margin: 0; border-radius: 0 0 8px 8px; }
+  .drum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; margin: 16px auto; }
+  .drum button { padding: 28px 0; margin: 0; font-size: 1.1rem; }
+  .simon { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 320px; margin: 16px auto; }
+  .simon button { height: 110px; margin: 0; font-size: 1.4rem; border-radius: 14px; }
+  #simon0 { background: #dc2626; } #simon1 { background: #16a34a; } #simon2 { background: #2563eb; } #simon3 { background: #eab308; color: #111; }
+  .simon button.lit { filter: brightness(1.8); transform: scale(1.05); }
+  .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .todoitem { display: flex; gap: 8px; align-items: center; background: #1f2937; border-radius: 10px; padding: 10px; margin: 6px auto; max-width: 420px; text-align: left; }
+  .todoitem.done span { text-decoration: line-through; opacity: .6; }
+  .todoitem span { flex: 1; }
+  .wordrow { display: flex; gap: 5px; justify-content: center; margin: 5px 0; }
+  .wordcell { width: 44px; height: 44px; border: 2px solid #4b5563; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; text-transform: uppercase; }
+  .wordcell.g { background: #16a34a; border-color: #16a34a; } .wordcell.y { background: #ca8a04; border-color: #ca8a04; } .wordcell.x { background: #374151; }
+  .sudoku { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; max-width: 360px; margin: 12px auto; }
+  .sudoku input { width: 100%; margin: 0; padding: 0; height: 36px; font-size: 1rem; border-radius: 4px; text-align: center; }
+  .sudoku input.fixed { background: #374151; color: #fbbf24; font-weight: bold; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div id="menu">
-    <h1>🎮 idk</h1>
-    <p class="sub">Pick a game — all three are right here.</p>
-    <div class="menu">
-      <div class="card" onclick="showGame('snake')"><div class="emoji">🐍</div><h2>Snake</h2><p>Eat the food, grow longer, don't hit the wall or yourself. Arrow keys, swipe, or the buttons.</p></div>
-      <div class="card" onclick="showGame('ttt')"><div class="emoji">❌⭕</div><h2>Tic-Tac-Toe</h2><p>Play against the computer, or pass-and-play with a friend.</p></div>
-      <div class="card" onclick="showGame('memory')"><div class="emoji">🃏</div><h2>Memory Match</h2><p>Flip cards and find all 8 pairs in as few moves as you can.</p></div>
-    </div>
-    <p class="sub" style="margin-top:24px">Made for jordanIsCool-glitch/idk</p>
-  </div>
-
-  <!-- Snake -->
-  <div id="snake" class="hidden">
-    <h1>🐍 Snake</h1>
-    <div class="score" id="snakeScore">Score: 0</div>
-    <canvas id="snakeCanvas" width="400" height="400"></canvas>
-    <div><button onclick="startSnake()">Start / Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
-    <div class="pad">
-      <span></span><button onclick="setDir(0,-1)">↑</button><span></span>
-      <button onclick="setDir(-1,0)">←</button><button onclick="setDir(0,1)">↓</button><button onclick="setDir(1,0)">→</button>
-    </div>
-    <p class="status" id="snakeStatus">Press Start, then use arrow keys, swipe, or the buttons.</p>
-  </div>
-
-  <!-- Tic-tac-toe -->
-  <div id="ttt" class="hidden">
-    <h1>❌⭕ Tic-Tac-Toe</h1>
-    <div><button id="modeBtn" onclick="toggleMode()">Mode: vs Computer</button></div>
-    <div class="status" id="tttStatus">Your turn — you're X</div>
-    <div class="board" id="tttBoard"></div>
-    <div><button onclick="resetTTT()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
-  </div>
-
-  <!-- Memory -->
-  <div id="memory" class="hidden">
-    <h1>🃏 Memory Match</h1>
-    <div class="score" id="memoryScore">Moves: 0 &nbsp;•&nbsp; Pairs: 0 / 8</div>
-    <div class="memory" id="memoryBoard"></div>
-    <div class="status" id="memoryStatus">Flip two cards to find a pair.</div>
-    <div><button onclick="startMemory()">Shuffle &amp; Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div>
-  </div>
+<div id="menu">
+<h1>🎮 idk</h1>
+<p class="sub">50 games &amp; apps — pick one!</p>
+<div class="menu">
+<div class="card" onclick="showGame('snake')"><span class="num">1</span><div class="emoji">🐍</div><h2>Snake</h2><p>Eat the food, grow longer, don't hit the wall.</p></div>
+<div class="card" onclick="showGame('ttt')"><span class="num">2</span><div class="emoji">❌⭕</div><h2>Tic-Tac-Toe</h2><p>Play against the computer or a friend.</p></div>
+<div class="card" onclick="showGame('memory')"><span class="num">3</span><div class="emoji">🃏</div><h2>Memory Match</h2><p>Flip cards and find all 8 pairs.</p></div>
+<div class="card" onclick="showGame('pong')"><span class="num">4</span><div class="emoji">🏓</div><h2>Pong</h2><p>Bounce the ball past the computer paddle.</p></div>
+<div class="card" onclick="showGame('breakout')"><span class="num">5</span><div class="emoji">🧱</div><h2>Breakout</h2><p>Smash all the bricks with the ball.</p></div>
+<div class="card" onclick="showGame('flappy')"><span class="num">6</span><div class="emoji">🐤</div><h2>Flappy Bird</h2><p>Tap to fly through the pipes.</p></div>
+<div class="card" onclick="showGame('mines')"><span class="num">7</span><div class="emoji">💣</div><h2>Minesweeper</h2><p>Clear the field without hitting a mine.</p></div>
+<div class="card" onclick="showGame('tetris')"><span class="num">8</span><div class="emoji">🟪</div><h2>Tetris Lite</h2><p>Stack falling blocks and clear lines.</p></div>
+<div class="card" onclick="showGame('simon')"><span class="num">9</span><div class="emoji">🔴</div><h2>Simon Says</h2><p>Repeat the growing colour pattern.</p></div>
+<div class="card" onclick="showGame('whack')"><span class="num">10</span><div class="emoji">🔨</div><h2>Whack-a-Mole</h2><p>Tap the moles as fast as you can.</p></div>
+<div class="card" onclick="showGame('rps')"><span class="num">11</span><div class="emoji">✂️</div><h2>Rock Paper Scissors</h2><p>Beat the computer, best of luck.</p></div>
+<div class="card" onclick="showGame('hangman')"><span class="num">12</span><div class="emoji">🎯</div><h2>Hangman</h2><p>Guess the word before you run out of lives.</p></div>
+<div class="card" onclick="showGame('wordle')"><span class="num">13</span><div class="emoji">🔤</div><h2>Wordle Lite</h2><p>Guess the 5-letter word in 6 tries.</p></div>
+<div class="card" onclick="showGame('connect4')"><span class="num">14</span><div class="emoji">🔴</div><h2>Connect Four</h2><p>Drop discs and get four in a row.</p></div>
+<div class="card" onclick="showGame('sudoku')"><span class="num">15</span><div class="emoji">🔢</div><h2>Sudoku</h2><p>Fill the grid so every row and column works.</p></div>
+<div class="card" onclick="showGame('game2048')"><span class="num">16</span><div class="emoji">2️⃣</div><h2>2048</h2><p>Slide tiles and merge to 2048.</p></div>
+<div class="card" onclick="showGame('dice')"><span class="num">17</span><div class="emoji">🎲</div><h2>Dice Roller</h2><p>Roll one or two dice.</p></div>
+<div class="card" onclick="showGame('coin')"><span class="num">18</span><div class="emoji">🪙</div><h2>Coin Flip</h2><p>Heads or tails? Flip and see.</p></div>
+<div class="card" onclick="showGame('calc')"><span class="num">19</span><div class="emoji">🧮</div><h2>Calculator</h2><p>A simple working calculator.</p></div>
+<div class="card" onclick="showGame('stopwatch')"><span class="num">20</span><div class="emoji">⏱️</div><h2>Stopwatch</h2><p>Time yourself, start and stop.</p></div>
+<div class="card" onclick="showGame('countdown')"><span class="num">21</span><div class="emoji">⏲️</div><h2>Countdown Timer</h2><p>Set minutes and count down.</p></div>
+<div class="card" onclick="showGame('draw')"><span class="num">22</span><div class="emoji">🎨</div><h2>Drawing Pad</h2><p>Draw with your finger or mouse.</p></div>
+<div class="card" onclick="showGame('color')"><span class="num">23</span><div class="emoji">🌈</div><h2>Color Picker</h2><p>Pick a colour and see its code.</p></div>
+<div class="card" onclick="showGame('notes')"><span class="num">24</span><div class="emoji">📝</div><h2>Notes</h2><p>Write a note, it saves on this device.</p></div>
+<div class="card" onclick="showGame('todo')"><span class="num">25</span><div class="emoji">✅</div><h2>Todo List</h2><p>Add tasks and tick them off.</p></div>
+<div class="card" onclick="showGame('quote')"><span class="num">26</span><div class="emoji">💬</div><h2>Random Quote</h2><p>Get a new inspiring quote.</p></div>
+<div class="card" onclick="showGame('joke')"><span class="num">27</span><div class="emoji">😂</div><h2>Joke Generator</h2><p>Get a random joke.</p></div>
+<div class="card" onclick="showGame('password')"><span class="num">28</span><div class="emoji">🔐</div><h2>Password Generator</h2><p>Make a strong random password.</p></div>
+<div class="card" onclick="showGame('converter')"><span class="num">29</span><div class="emoji">📏</div><h2>Unit Converter</h2><p>Convert length, weight and temperature.</p></div>
+<div class="card" onclick="showGame('bmi')"><span class="num">30</span><div class="emoji">⚖️</div><h2>BMI Calculator</h2><p>Work out your body mass index.</p></div>
+<div class="card" onclick="showGame('tip')"><span class="num">31</span><div class="emoji">💰</div><h2>Tip Calculator</h2><p>Split a bill and work out the tip.</p></div>
+<div class="card" onclick="showGame('pomodoro')"><span class="num">32</span><div class="emoji">🍅</div><h2>Pomodoro Timer</h2><p>25 minutes focus, 5 minutes break.</p></div>
+<div class="card" onclick="showGame('reaction')"><span class="num">33</span><div class="emoji">⚡</div><h2>Reaction Time Test</h2><p>Tap as soon as it turns green.</p></div>
+<div class="card" onclick="showGame('typing')"><span class="num">34</span><div class="emoji">⌨️</div><h2>Typing Test</h2><p>Type the sentence and check your speed.</p></div>
+<div class="card" onclick="showGame('clickspeed')"><span class="num">35</span><div class="emoji">🖱️</div><h2>Click Speed Test</h2><p>How many clicks in 10 seconds?</p></div>
+<div class="card" onclick="showGame('guessing')"><span class="num">36</span><div class="emoji">🔮</div><h2>Number Guessing</h2><p>Guess the number from 1 to 100.</p></div>
+<div class="card" onclick="showGame('higherlower')"><span class="num">37</span><div class="emoji">⬆️</div><h2>Higher or Lower</h2><p>Guess if the next card is higher.</p></div>
+<div class="card" onclick="showGame('trivia')"><span class="num">38</span><div class="emoji">🧠</div><h2>Trivia Quiz</h2><p>Answer 5 general knowledge questions.</p></div>
+<div class="card" onclick="showGame('mathquiz')"><span class="num">39</span><div class="emoji">➗</div><h2>Math Quiz</h2><p>10 quick maths questions.</p></div>
+<div class="card" onclick="showGame('scramble')"><span class="num">40</span><div class="emoji">🔀</div><h2>Word Scramble</h2><p>Unscramble the word.</p></div>
+<div class="card" onclick="showGame('bubble')"><span class="num">41</span><div class="emoji">🫧</div><h2>Bubble Pop</h2><p>Pop as many bubbles as you can.</p></div>
+<div class="card" onclick="showGame('catch')"><span class="num">42</span><div class="emoji">🧺</div><h2>Catch the Falling Objects</h2><p>Move the basket and catch the falling fruit.</p></div>
+<div class="card" onclick="showGame('maze')"><span class="num">43</span><div class="emoji">🌀</div><h2>Maze</h2><p>Find your way to the exit.</p></div>
+<div class="card" onclick="showGame('piano')"><span class="num">44</span><div class="emoji">🎹</div><h2>Piano Keyboard</h2><p>Play notes on a piano.</p></div>
+<div class="card" onclick="showGame('drum')"><span class="num">45</span><div class="emoji">🥁</div><h2>Drum Pad</h2><p>Tap the pads to make beats.</p></div>
+<div class="card" onclick="showGame('slots')"><span class="num">46</span><div class="emoji">🎰</div><h2>Slot Machine</h2><p>Spin the reels and match three.</p></div>
+<div class="card" onclick="showGame('eightball')"><span class="num">47</span><div class="emoji">🎱</div><h2>Magic 8-Ball</h2><p>Ask a question, shake for an answer.</p></div>
+<div class="card" onclick="showGame('checkers')"><span class="num">48</span><div class="emoji">♟️</div><h2>Checkers</h2><p>Jump your opponent's pieces.</p></div>
+<div class="card" onclick="showGame('lights')"><span class="num">49</span><div class="emoji">💡</div><h2>Lights Out</h2><p>Tap lights to turn them all off.</p></div>
+<div class="card" onclick="showGame('aim')"><span class="num">50</span><div class="emoji">🎯</div><h2>Aim Trainer</h2><p>Tap the targets as fast as you can.</p></div>
+</div>
+<p class="sub" style="margin-top:24px">Made for jordanIsCool-glitch/idk — 50 apps in one page</p>
 </div>
 
-<script>
-function showMenu(){ ['snake','ttt','memory'].forEach(id=>document.getElementById(id).classList.add('hidden')); document.getElementById('menu').classList.remove('hidden'); stopSnake(); }
-function showGame(id){ document.getElementById('menu').classList.add('hidden'); ['snake','ttt','memory'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='ttt') resetTTT(); if(id==='memory') startMemory(); if(id==='snake') drawSnake(); window.scrollTo(0,0); }
+<!-- 1 Snake -->
+<div id="snake" class="app hidden"><h1>🐍 Snake</h1><div class="score" id="snakeScore">Score: 0</div><canvas id="snakeCanvas" width="400" height="400"></canvas><div><button onclick="startSnake()">Start / Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div><div class="pad"><span></span><button onclick="setDir(0,-1)">↑</button><span></span><button onclick="setDir(-1,0)">←</button><button onclick="setDir(0,1)">↓</button><button onclick="setDir(1,0)">→</button></div><p class="status" id="snakeStatus">Press Start, then use arrow keys, swipe, or the buttons.</p></div>
+<!-- 2 Tic-Tac-Toe -->
+<div id="ttt" class="app hidden"><h1>❌⭕ Tic-Tac-Toe</h1><div><button id="modeBtn" onclick="toggleMode()">Mode: vs Computer</button></div><div class="status" id="tttStatus">Your turn — you're X</div><div class="board" id="tttBoard"></div><div><button onclick="resetTTT()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 3 Memory -->
+<div id="memory" class="app hidden"><h1>🃏 Memory Match</h1><div class="score" id="memoryScore">Moves: 0 • Pairs: 0 / 8</div><div class="memory" id="memoryBoard"></div><div class="status" id="memoryStatus">Flip two cards to find a pair.</div><div><button onclick="startMemory()">Shuffle &amp; Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 4 Pong -->
+<div id="pong" class="app hidden"><h1>🏓 Pong</h1><div class="score" id="pongScore">You 0 — 0 Computer</div><canvas id="pongCanvas" width="400" height="300"></canvas><p class="status">Move your paddle with mouse / touch. First to 5 wins.</p><div><button onclick="startPong()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 5 Breakout -->
+<div id="breakout" class="app hidden"><h1>🧱 Breakout</h1><div class="score" id="breakScore">Score: 0 • Lives: 3</div><canvas id="breakCanvas" width="400" height="300"></canvas><p class="status">Move the paddle with mouse / touch or arrow keys.</p><div><button onclick="startBreak()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 6 Flappy -->
+<div id="flappy" class="app hidden"><h1>🐤 Flappy Bird</h1><div class="score" id="flapScore">Score: 0</div><canvas id="flapCanvas" width="400" height="300"></canvas><p class="status">Tap the screen or press Space to flap.</p><div><button onclick="startFlap()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 7 Minesweeper -->
+<div id="mines" class="app hidden"><h1>💣 Minesweeper</h1><div class="score" id="mineScore">Mines: 10</div><div class="grid5" id="mineBoard" style="grid-template-columns:repeat(9,1fr);max-width:360px"></div><p class="status" id="mineStatus">Tap a square to reveal it. Long-press / right-click to flag.</p><div><button onclick="initMines()">New Game</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 8 Tetris Lite -->
+<div id="tetris" class="app hidden"><h1>🟪 Tetris Lite</h1><div class="score" id="tetScore">Score: 0 • Lines: 0</div><canvas id="tetCanvas" width="200" height="400"></canvas><p class="status">← → move, ↑ rotate, ↓ drop faster.</p><div class="row"><button onclick="tetMove(-1)">←</button><button onclick="tetRotate()">⟳</button><button onclick="tetMove(1)">→</button><button onclick="tetDrop()">↓</button></div><div><button onclick="startTet()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 9 Simon -->
+<div id="simon" class="app hidden"><h1>🔴 Simon Says</h1><div class="score" id="simonScore">Round: 0</div><div class="simon"><button id="simon0" onclick="simonPress(0)">🔴</button><button id="simon1" onclick="simonPress(1)">🟢</button><button id="simon2" onclick="simonPress(2)">🔵</button><button id="simon3" onclick="simonPress(3)">🟡</button></div><p class="status" id="simonStatus">Press Start, watch, then repeat the pattern.</p><div><button onclick="startSimon()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 10 Whack -->
+<div id="whack" class="app hidden"><h1>🔨 Whack-a-Mole</h1><div class="score" id="whackScore">Score: 0 • Time: 30s</div><div class="grid3" id="whackBoard"></div><p class="status" id="whackStatus">Tap the mole when it pops up!</p><div><button onclick="startWhack()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 11 RPS -->
+<div id="rps" class="app hidden"><h1>✂️ Rock Paper Scissors</h1><div class="score" id="rpsScore">You 0 — 0 Computer</div><div class="big" id="rpsResult">👊 ✋ ✌️</div><p class="status" id="rpsStatus">Pick one!</p><div><button onclick="playRPS('rock')">🪨 Rock</button><button onclick="playRPS('paper')">📄 Paper</button><button onclick="playRPS('scissors')">✂️ Scissors</button></div><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 12 Hangman -->
+<div id="hangman" class="app hidden"><h1>🎯 Hangman</h1><div class="big" id="hangWord">_ _ _</div><div class="score" id="hangLives">Lives: 6</div><div class="keys" id="hangKeys"></div><p class="status" id="hangStatus"></p><div><button onclick="initHang()">New Word</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 13 Wordle -->
+<div id="wordle" class="app hidden"><h1>🔤 Wordle Lite</h1><div id="wordleBoard"></div><input type="text" id="wordleInput" maxlength="5" placeholder="5-letter word"><div><button onclick="guessWordle()">Guess</button><button onclick="initWordle()">New Word</button></div><p class="status" id="wordleStatus">Green = right letter, right place. Yellow = in the word, wrong place.</p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 14 Connect Four -->
+<div id="connect4" class="app hidden"><h1>🔴 Connect Four</h1><div class="status" id="c4Status">Your turn — you're 🔴</div><div id="c4Board" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:420px;margin:12px auto"></div><div><button onclick="initC4()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 15 Sudoku -->
+<div id="sudoku" class="app hidden"><h1>🔢 Sudoku</h1><div class="sudoku" id="sudokuBoard"></div><p class="status" id="sudokuStatus">Fill 1–9 in every row, column and 3×3 box.</p><div><button onclick="checkSudoku()">Check</button><button onclick="initSudoku()">New Puzzle</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 16 2048 -->
+<div id="game2048" class="app hidden"><h1>2️⃣ 2048</h1><div class="score" id="s2048">Score: 0</div><div class="grid4" id="b2048"></div><div class="pad"><span></span><button onclick="move2048('up')">↑</button><span></span><button onclick="move2048('left')">←</button><button onclick="move2048('down')">↓</button><button onclick="move2048('right')">→</button></div><p class="status">Use arrow keys or the buttons to slide tiles.</p><div><button onclick="init2048()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 17 Dice -->
+<div id="dice" class="app hidden"><h1>🎲 Dice Roller</h1><div class="big" id="diceResult">🎲 🎲</div><div class="row"><button onclick="rollDice(1)">Roll 1</button><button onclick="rollDice(2)">Roll 2</button></div><p class="status" id="diceStatus">Total: —</p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 18 Coin -->
+<div id="coin" class="app hidden"><h1>🪙 Coin Flip</h1><div class="big" id="coinResult">🪙</div><div class="score" id="coinScore">Heads: 0 • Tails: 0</div><div><button onclick="flipCoin()">Flip!</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 19 Calculator -->
+<div id="calc" class="app hidden"><h1>🧮 Calculator</h1><input type="text" id="calcDisplay" readonly value="0"><div class="calc"><button onclick="calcPress('7')">7</button><button onclick="calcPress('8')">8</button><button onclick="calcPress('9')">9</button><button onclick="calcPress('/')">÷</button><button onclick="calcPress('4')">4</button><button onclick="calcPress('5')">5</button><button onclick="calcPress('6')">6</button><button onclick="calcPress('*')">×</button><button onclick="calcPress('1')">1</button><button onclick="calcPress('2')">2</button><button onclick="calcPress('3')">3</button><button onclick="calcPress('-')">−</button><button onclick="calcPress('0')">0</button><button onclick="calcPress('.')">.</button><button onclick="calcEq()">=</button><button onclick="calcPress('+')">+</button></div><div><button onclick="calcClear()">Clear</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 20 Stopwatch -->
+<div id="stopwatch" class="app hidden"><h1>⏱️ Stopwatch</h1><div class="big" id="swDisplay">00:00.0</div><div><button onclick="swStart()">Start</button><button onclick="swStop()">Stop</button><button onclick="swReset()">Reset</button></div><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
 
-/* --- Snake --- */
-const canvas=document.getElementById('snakeCanvas'), ctx=canvas.getContext('2d');
+<!-- 21 Countdown -->
+<div id="countdown" class="app hidden"><h1>⏲️ Countdown Timer</h1><input type="number" id="cdMin" value="5" min="1" max="120"><p class="status">minutes</p><div class="big" id="cdDisplay">05:00</div><div><button onclick="cdStart()">Start</button><button onclick="cdStop()">Stop</button></div><p class="status" id="cdStatus"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 22 Drawing -->
+<div id="draw" class="app hidden"><h1>🎨 Drawing Pad</h1><canvas id="drawCanvas" width="400" height="300" style="background:#fff"></canvas><div class="row"><input type="color" id="drawColor" value="#2563eb" style="width:60px"><button onclick="drawClear()">Clear</button></div><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 23 Color -->
+<div id="color" class="app hidden"><h1>🌈 Color Picker</h1><input type="color" id="colorInput" value="#2563eb" style="width:120px;height:80px"><div class="big" id="colorHex">#2563eb</div><div id="colorSwatch" style="height:80px;border-radius:12px;background:#2563eb;max-width:320px;margin:0 auto"></div><div><button onclick="randomColor()">Random Colour</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 24 Notes -->
+<div id="notes" class="app hidden"><h1>📝 Notes</h1><textarea id="noteText" rows="10" placeholder="Write your note here..."></textarea><div><button onclick="saveNote()">Save Note</button><button onclick="clearNote()">Clear</button></div><p class="status" id="noteStatus"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 25 Todo -->
+<div id="todo" class="app hidden"><h1>✅ Todo List</h1><div class="row"><input type="text" id="todoInput" placeholder="New task..."><button onclick="addTodo()">Add</button></div><div id="todoList"></div><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 26 Quote -->
+<div id="quote" class="app hidden"><h1>💬 Random Quote</h1><div class="big" style="font-size:1.4rem" id="quoteText">Tap for a quote!</div><p class="status" id="quoteAuthor"></p><div><button onclick="newQuote()">New Quote</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 27 Joke -->
+<div id="joke" class="app hidden"><h1>😂 Joke Generator</h1><div class="big" style="font-size:1.3rem" id="jokeText">Tap for a joke!</div><div><button onclick="newJoke()">New Joke</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 28 Password -->
+<div id="password" class="app hidden"><h1>🔐 Password Generator</h1><div class="row"><label>Length <input type="number" id="pwLen" value="12" min="6" max="32" style="width:80px"></label></div><div class="big" style="font-size:1.2rem;word-break:break-all" id="pwResult">—</div><div><button onclick="genPassword()">Generate</button><button onclick="copyPw()">Copy</button></div><p class="status" id="pwStatus"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 29 Converter -->
+<div id="converter" class="app hidden"><h1>📏 Unit Converter</h1><input type="number" id="convIn" value="1"><select id="convType"><option value="m-ft">Metres → Feet</option><option value="ft-m">Feet → Metres</option><option value="kg-lb">Kg → Pounds</option><option value="lb-kg">Pounds → Kg</option><option value="c-f">°C → °F</option><option value="f-c">°F → °C</option><option value="km-mi">Km → Miles</option><option value="mi-km">Miles → Km</option></select><div class="big" id="convOut">—</div><div><button onclick="doConvert()">Convert</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 30 BMI -->
+<div id="bmi" class="app hidden"><h1>⚖️ BMI Calculator</h1><input type="number" id="bmiH" placeholder="Height (cm)"><input type="number" id="bmiW" placeholder="Weight (kg)"><div class="big" id="bmiOut">—</div><p class="status" id="bmiCat"></p><div><button onclick="calcBMI()">Calculate</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 31 Tip -->
+<div id="tip" class="app hidden"><h1>💰 Tip Calculator</h1><input type="number" id="tipBill" placeholder="Bill total"><input type="number" id="tipPct" value="15" placeholder="Tip %"><input type="number" id="tipSplit" value="1" placeholder="Split between"><div class="big" id="tipOut">—</div><div><button onclick="calcTip()">Calculate</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 32 Pomodoro -->
+<div id="pomodoro" class="app hidden"><h1>🍅 Pomodoro Timer</h1><div class="big" id="pomDisplay">25:00</div><p class="status" id="pomStatus">Focus time — work for 25 minutes!</p><div><button onclick="pomStart()">Start</button><button onclick="pomStop()">Stop</button><button onclick="pomSwitch()">Switch to Break</button></div><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 33 Reaction -->
+<div id="reaction" class="app hidden"><h1>⚡ Reaction Time Test</h1><div id="reactBox" style="height:200px;border-radius:16px;background:#374151;display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;margin:16px 0" onclick="reactClick()">Tap Start, then tap when it turns green!</div><div class="score" id="reactScore"></div><div><button onclick="startReact()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 34 Typing -->
+<div id="typing" class="app hidden"><h1>⌨️ Typing Test</h1><p id="typeSentence" style="font-size:1.2rem">The quick brown fox jumps over the lazy dog.</p><input type="text" id="typeInput" placeholder="Type the sentence here"><div class="score" id="typeScore"></div><div><button onclick="startTyping()">Start</button><button onclick="checkTyping()">Check</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 35 Click Speed -->
+<div id="clickspeed" class="app hidden"><h1>🖱️ Click Speed Test</h1><div class="score" id="clickScore">Clicks: 0 • Time left: 10s</div><button style="padding:40px 60px;font-size:1.4rem" onclick="clickSpeed()">CLICK ME!</button><div><button onclick="startClick()">Start (10s)</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 36 Guessing -->
+<div id="guessing" class="app hidden"><h1>🔮 Number Guessing</h1><p class="status">I'm thinking of a number from 1 to 100.</p><input type="number" id="guessInput" placeholder="Your guess"><div><button onclick="makeGuess()">Guess</button><button onclick="initGuess()">New Game</button></div><p class="status" id="guessStatus"></p><p class="status" id="guessCount"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 37 Higher Lower -->
+<div id="higherlower" class="app hidden"><h1>⬆️ Higher or Lower</h1><div class="big" id="hlCard">🂠</div><p class="status" id="hlStatus">Will the next card be higher or lower?</p><div class="score" id="hlScore">Score: 0 • Streak: 0</div><div><button onclick="hlGuess('higher')">Higher ⬆️</button><button onclick="hlGuess('lower')">Lower ⬇️</button></div><div><button onclick="initHL()">New Game</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 38 Trivia -->
+<div id="trivia" class="app hidden"><h1>🧠 Trivia Quiz</h1><div id="triviaBox"></div><div><button onclick="initTrivia()">Start Quiz</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 39 Math Quiz -->
+<div id="mathquiz" class="app hidden"><h1>➗ Math Quiz</h1><div class="big" id="mathQ">Press Start</div><input type="number" id="mathAns" placeholder="Answer"><div class="score" id="mathScore">Question 0/10 • Correct: 0</div><div><button onclick="mathCheck()">Answer</button><button onclick="initMath()">Start Quiz</button></div><p class="status" id="mathStatus"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 40 Scramble -->
+<div id="scramble" class="app hidden"><h1>🔀 Word Scramble</h1><div class="big" id="scrWord">—</div><input type="text" id="scrInput" placeholder="Your answer"><div class="score" id="scrScore">Score: 0</div><div><button onclick="checkScramble()">Check</button><button onclick="newScramble()">New Word</button></div><p class="status" id="scrStatus"></p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+
+<!-- 41 Bubble -->
+<div id="bubble" class="app hidden"><h1>🫧 Bubble Pop</h1><div class="score" id="bubScore">Popped: 0 • Time: 30s</div><div id="bubArea" style="position:relative;height:300px;background:#0f172a;border-radius:12px;overflow:hidden;margin:12px 0"></div><div><button onclick="startBubble()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 42 Catch -->
+<div id="catch" class="app hidden"><h1>🧺 Catch the Falling Objects</h1><div class="score" id="catchScore">Caught: 0 • Missed: 0</div><canvas id="catchCanvas" width="400" height="300"></canvas><p class="status">Move with mouse / touch or ← → keys.</p><div><button onclick="startCatch()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 43 Maze -->
+<div id="maze" class="app hidden"><h1>🌀 Maze</h1><canvas id="mazeCanvas" width="400" height="400"></canvas><p class="status" id="mazeStatus">Use arrow keys or the buttons to reach the green square.</p><div class="pad"><span></span><button onclick="mazeMove(0,-1)">↑</button><span></span><button onclick="mazeMove(-1,0)">←</button><button onclick="mazeMove(0,1)">↓</button><button onclick="mazeMove(1,0)">→</button></div><div><button onclick="initMaze()">New Maze</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 44 Piano -->
+<div id="piano" class="app hidden"><h1>🎹 Piano Keyboard</h1><div class="piano"><button onclick="playNote(261.6)">C</button><button onclick="playNote(293.7)">D</button><button onclick="playNote(329.6)">E</button><button onclick="playNote(349.2)">F</button><button onclick="playNote(392)">G</button><button onclick="playNote(440)">A</button><button onclick="playNote(493.9)">B</button><button onclick="playNote(523.3)">C2</button></div><p class="status">Tap the keys to play. Sound needs your volume on.</p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 45 Drum -->
+<div id="drum" class="app hidden"><h1>🥁 Drum Pad</h1><div class="drum"><button onclick="drumHit('kick')">🥁 Kick</button><button onclick="drumHit('snare')">🥁 Snare</button><button onclick="drumHit('hat')">🎩 Hi-Hat</button><button onclick="drumHit('tom')">🪘 Tom</button><button onclick="drumHit('clap')">👏 Clap</button><button onclick="drumHit('crash')">💥 Crash</button></div><p class="status">Tap the pads to make a beat.</p><div><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 46 Slots -->
+<div id="slots" class="app hidden"><h1>🎰 Slot Machine</h1><div class="big" id="slotResult">🍒 🍋 ⭐</div><div class="score" id="slotScore">Credits: 100</div><div><button onclick="spinSlots()">Spin (10 credits)</button><button class="secondary" onclick="showMenu()">Back to menu</button></div><p class="status" id="slotStatus">Match 3 to win 50, match 2 to win 20.</p></div>
+<!-- 47 8-Ball -->
+<div id="eightball" class="app hidden"><h1>🎱 Magic 8-Ball</h1><input type="text" id="ballQ" placeholder="Ask a yes/no question..."><div class="big" id="ballAns">🎱</div><div><button onclick="shakeBall()">Shake the 8-Ball</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 48 Checkers -->
+<div id="checkers" class="app hidden"><h1>♟️ Checkers</h1><div class="status" id="chkStatus">Red's turn — tap a red piece, then a square.</div><div id="chkBoard" style="display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-width:360px;margin:12px auto"></div><div><button onclick="initCheckers()">Restart</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 49 Lights -->
+<div id="lights" class="app hidden"><h1>💡 Lights Out</h1><div class="score" id="lightScore">Moves: 0</div><div class="grid5" id="lightBoard"></div><p class="status" id="lightStatus">Tap a light — it and its neighbours flip. Turn them all off!</p><div><button onclick="initLights()">New Game</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+<!-- 50 Aim -->
+<div id="aim" class="app hidden"><h1>🎯 Aim Trainer</h1><div class="score" id="aimScore">Hits: 0 • Time: 30s</div><div id="aimArea" style="position:relative;height:300px;background:#0f172a;border-radius:12px;overflow:hidden;margin:12px 0"></div><div><button onclick="startAim()">Start</button><button class="secondary" onclick="showMenu()">Back to menu</button></div></div>
+</div>
+<script>
+var ALL_IDS=['snake','ttt','memory','pong','breakout','flappy','mines','tetris','simon','whack','rps','hangman','wordle','connect4','sudoku','game2048','dice','coin','calc','stopwatch','countdown','draw','color','notes','todo','quote','joke','password','converter','bmi','tip','pomodoro','reaction','typing','clickspeed','guessing','higherlower','trivia','mathquiz','scramble','bubble','catch','maze','piano','drum','slots','eightball','checkers','lights','aim'];
+var timers=[];
+function regTimer(t){ timers.push(t); return t; }
+function clearTimers(){ timers.forEach(function(t){ clearInterval(t); clearTimeout(t); }); timers=[]; }
+function showMenu(){ clearTimers(); stopSnake(); if(typeof stopPong==='function') stopPong(); if(typeof stopBreak==='function') stopBreak(); if(typeof stopFlap==='function') stopFlap(); ALL_IDS.forEach(function(id){ var e=document.getElementById(id); if(e) e.classList.add('hidden'); }); document.getElementById('menu').classList.remove('hidden'); window.scrollTo(0,0); }
+function showGame(id){ document.getElementById('menu').classList.add('hidden'); ALL_IDS.forEach(function(x){ var e=document.getElementById(x); if(e) e.classList.add('hidden'); }); var el=document.getElementById(id); if(el) el.classList.remove('hidden'); window.scrollTo(0,0);
+  if(id==='ttt') resetTTT(); if(id==='memory') startMemory(); if(id==='snake') drawSnake();
+  if(id==='mines') initMines(); if(id==='tetris') drawTet(); if(id==='hangman') initHang(); if(id==='wordle') initWordle(); if(id==='connect4') initC4(); if(id==='sudoku') initSudoku(); if(id==='game2048') init2048(); if(id==='guessing') initGuess(); if(id==='higherlower') initHL(); if(id==='scramble') newScramble(); if(id==='maze') initMaze(); if(id==='checkers') initCheckers(); if(id==='lights') initLights(); if(id==='notes') loadNote(); if(id==='todo') renderTodo(); if(id==='whack') buildWhack(); if(id==='color') updateColor();
+}
+function $(id){ return document.getElementById(id); }
+function audioTone(freq,dur,type,vol){ try{ var ac=window._ac||(window._ac=new (window.AudioContext||window.webkitAudioContext)()); var o=ac.createOscillator(), g=ac.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.value=vol||0.2; o.connect(g); g.connect(ac.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+(dur||0.3)); o.stop(ac.currentTime+(dur||0.3)); }catch(e){} }
+function playNote(f){ audioTone(f,0.5,'triangle',0.3); }
+function drumHit(k){ var f={kick:120,snare:200,hat:6000,tom:300,clap:1000,crash:4000}[k]||400; audioTone(f, k==='hat'||k==='crash'?0.15:0.25, k==='hat'||k==='crash'?'square':'sine',0.3); }
+</script>
+
+<script>
+/* --- 1 Snake --- */
+const canvas=$('snakeCanvas'), ctx=canvas.getContext('2d');
 let snake, dir, food, score, snakeTimer=null, snakeRunning=false;
-function drawSnake(){
-  ctx.fillStyle='#000'; ctx.fillRect(0,0,400,400);
-  ctx.fillStyle='#ef4444'; ctx.fillRect(food.x*20, food.y*20, 20, 20);
-  snake.forEach((s,i)=>{ ctx.fillStyle=i===0?'#22c55e':'#16a34a'; ctx.fillRect(s.x*20, s.y*20, 19, 19); });
-}
+function drawSnake(){ ctx.fillStyle='#000'; ctx.fillRect(0,0,400,400); ctx.fillStyle='#ef4444'; ctx.fillRect(food.x*20, food.y*20, 20, 20); snake.forEach(function(s,i){ ctx.fillStyle=i===0?'#22c55e':'#16a34a'; ctx.fillRect(s.x*20, s.y*20, 19, 19); }); }
 function placeFood(){ food={x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)}; }
-function startSnake(){
-  snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; dir={x:1,y:0}; score=0; placeFood(); snakeRunning=true;
-  document.getElementById('snakeScore').textContent='Score: 0';
-  document.getElementById('snakeStatus').textContent='Playing — good luck!';
-  clearInterval(snakeTimer); snakeTimer=setInterval(tickSnake, 130); drawSnake();
-}
+function startSnake(){ snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; dir={x:1,y:0}; score=0; placeFood(); snakeRunning=true; $('snakeScore').textContent='Score: 0'; $('snakeStatus').textContent='Playing — good luck!'; clearInterval(snakeTimer); snakeTimer=setInterval(tickSnake,130); drawSnake(); }
 function stopSnake(){ snakeRunning=false; clearInterval(snakeTimer); }
 function setDir(x,y){ if(!snakeRunning) return; if(x===-dir.x && y===-dir.y) return; dir={x,y}; }
-function tickSnake(){
-  const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-  if(head.x<0||head.y<0||head.x>=20||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)){
-    stopSnake(); document.getElementById('snakeStatus').textContent='Game over! Score: '+score+'. Press Start to play again.'; return;
-  }
-  snake.unshift(head);
-  if(head.x===food.x&&head.y===food.y){ score+=10; document.getElementById('snakeScore').textContent='Score: '+score; placeFood(); }
-  else snake.pop();
-  drawSnake();
-}
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('snake').classList.contains('hidden')) return;
-  if(e.key==='ArrowUp') setDir(0,-1); if(e.key==='ArrowDown') setDir(0,1);
-  if(e.key==='ArrowLeft') setDir(-1,0); if(e.key==='ArrowRight') setDir(1,0);
-});
+function tickSnake(){ const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y}; if(head.x<0||head.y<0||head.x>=20||head.y>=20||snake.some(function(s){return s.x===head.x&&s.y===head.y;})){ stopSnake(); $('snakeStatus').textContent='Game over! Score: '+score+'. Press Start to play again.'; return; } snake.unshift(head); if(head.x===food.x&&head.y===food.y){ score+=10; $('snakeScore').textContent='Score: '+score; placeFood(); } else snake.pop(); drawSnake(); }
+document.addEventListener('keydown',function(e){ if(!$('snake').classList.contains('hidden')){ if(e.key==='ArrowUp') setDir(0,-1); if(e.key==='ArrowDown') setDir(0,1); if(e.key==='ArrowLeft') setDir(-1,0); if(e.key==='ArrowRight') setDir(1,0); } if(!$('game2048').classList.contains('hidden')){ if(e.key==='ArrowUp'){e.preventDefault();move2048('up');} if(e.key==='ArrowDown'){e.preventDefault();move2048('down');} if(e.key==='ArrowLeft'){e.preventDefault();move2048('left');} if(e.key==='ArrowRight'){e.preventDefault();move2048('right');} } if(!$('tetris').classList.contains('hidden')){ if(e.key==='ArrowLeft') tetMove(-1); if(e.key==='ArrowRight') tetMove(1); if(e.key==='ArrowUp') tetRotate(); if(e.key==='ArrowDown') tetDrop(); } if(!$('maze').classList.contains('hidden')){ if(e.key==='ArrowUp') mazeMove(0,-1); if(e.key==='ArrowDown') mazeMove(0,1); if(e.key==='ArrowLeft') mazeMove(-1,0); if(e.key==='ArrowRight') mazeMove(1,0); } if(!$('flappy').classList.contains('hidden') && e.key===' '){ e.preventDefault(); flap(); } if(!$('breakout').classList.contains('hidden')){ if(e.key==='ArrowLeft') breakPaddle-=20; if(e.key==='ArrowRight') breakPaddle+=20; } if(!$('catch').classList.contains('hidden')){ if(e.key==='ArrowLeft') catchX-=25; if(e.key==='ArrowRight') catchX+=25; } });
 let touchX=0, touchY=0;
-canvas.addEventListener('touchstart',e=>{ touchX=e.touches[0].clientX; touchY=e.touches[0].clientY; },{passive:true});
-canvas.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchX, dy=e.changedTouches[0].clientY-touchY;
-  if(Math.abs(dx)>Math.abs(dy)) setDir(dx>0?1:-1,0); else setDir(0,dy>0?1:-1);
-},{passive:true});
+canvas.addEventListener('touchstart',function(e){ touchX=e.touches[0].clientX; touchY=e.touches[0].clientY; },{passive:true});
+canvas.addEventListener('touchend',function(e){ const dx=e.changedTouches[0].clientX-touchX, dy=e.changedTouches[0].clientY-touchY; if(Math.abs(dx)>Math.abs(dy)) setDir(dx>0?1:-1,0); else setDir(0,dy>0?1:-1); },{passive:true});
 snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; food={x:15,y:10}; drawSnake();
-
-/* --- Tic-tac-toe --- */
+/* --- 2 Tic-Tac-Toe --- */
 let tttBoard, tttTurn, tttOver, vsComputer=true;
-function toggleMode(){ vsComputer=!vsComputer; document.getElementById('modeBtn').textContent='Mode: '+(vsComputer?'vs Computer':'2 Players'); resetTTT(); }
-function resetTTT(){
-  tttBoard=Array(9).fill(''); tttTurn='X'; tttOver=false;
-  document.getElementById('tttStatus').textContent=vsComputer?'Your turn — you\'re X':'Player X\'s turn';
-  const b=document.getElementById('tttBoard'); b.innerHTML='';
-  tttBoard.forEach((_,i)=>{ const c=document.createElement('div'); c.className='cell'; c.onclick=()=>tttMove(i); b.appendChild(c); });
-}
-function tttMove(i){
-  if(tttOver||tttBoard[i]) return;
-  tttBoard[i]=tttTurn; renderTTT();
-  const w=tttWinner(); if(w){ endTTT(w); return; }
-  if(tttBoard.every(Boolean)){ endTTT('draw'); return; }
-  tttTurn=tttTurn==='X'?'O':'X';
-  document.getElementById('tttStatus').textContent=vsComputer?(tttTurn==='X'?'Your turn — you\'re X':'Computer is thinking…'):'Player '+tttTurn+'\'s turn';
-  if(vsComputer&&tttTurn==='O') setTimeout(computerMove, 400);
-}
-function computerMove(){
-  if(tttOver) return;
-  const empty=tttBoard.map((v,i)=>v?null:i).filter(v=>v!==null);
-  const pick=empty[Math.floor(Math.random()*empty.length)];
-  tttMove(pick);
-}
-function renderTTT(){ document.querySelectorAll('#tttBoard .cell').forEach((c,i)=>c.textContent=tttBoard[i]); }
-function tttWinner(){
-  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  for(const [a,b,c] of lines) if(tttBoard[a]&&tttBoard[a]===tttBoard[b]&&tttBoard[a]===tttBoard[c]) return tttBoard[a];
-  return null;
-}
-function endTTT(w){
-  tttOver=true;
-  document.getElementById('tttStatus').textContent=w==='draw'?'It\'s a draw!':(w==='X'?'X wins! 🎉':'O wins! 🎉');
-}
-
-/* --- Memory --- */
+function toggleMode(){ vsComputer=!vsComputer; $('modeBtn').textContent='Mode: '+(vsComputer?'vs Computer':'2 Players'); resetTTT(); }
+function resetTTT(){ tttBoard=Array(9).fill(''); tttTurn='X'; tttOver=false; $('tttStatus').textContent=vsComputer?"Your turn — you're X":"Player X's turn"; const b=$('tttBoard'); b.innerHTML=''; tttBoard.forEach(function(_,i){ const c=document.createElement('div'); c.className='cell'; c.onclick=function(){ tttMove(i); }; b.appendChild(c); }); }
+function tttMove(i){ if(tttOver||tttBoard[i]) return; tttBoard[i]=tttTurn; renderTTT(); const w=tttWinner(); if(w){ endTTT(w); return; } if(tttBoard.every(Boolean)){ endTTT('draw'); return; } tttTurn=tttTurn==='X'?'O':'X'; $('tttStatus').textContent=vsComputer?(tttTurn==='X'?"Your turn — you're X":'Computer is thinking…'):"Player "+tttTurn+"'s turn"; if(vsComputer&&tttTurn==='O') setTimeout(computerMove,400); }
+function computerMove(){ if(tttOver) return; const empty=tttBoard.map(function(v,i){return v?null:i;}).filter(function(v){return v!==null;}); const pick=empty[Math.floor(Math.random()*empty.length)]; tttMove(pick); }
+function renderTTT(){ document.querySelectorAll('#tttBoard .cell').forEach(function(c,i){ c.textContent=tttBoard[i]; }); }
+function tttWinner(){ const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(const [a,b,c] of lines) if(tttBoard[a]&&tttBoard[a]===tttBoard[b]&&tttBoard[a]===tttBoard[c]) return tttBoard[a]; return null; }
+function endTTT(w){ tttOver=true; $('tttStatus').textContent=w==='draw'?"It's a draw!":(w==='X'?'X wins! 🎉':'O wins! 🎉'); }
+/* --- 3 Memory --- */
 const EMOJIS=['🍎','🚀','🐶','🌈','⚽','🎵','🌙','🍕'];
-let memCards, memFlipped, memMatched, memMoves, memLock;
-function startMemory(){
-  const deck=[...EMOJIS,...EMOJIS].sort(()=>Math.random()-0.5);
-  memCards=deck; memFlipped=[]; memMatched=0; memMoves=0; memLock=false;
-  document.getElementById('memoryScore').textContent='Moves: 0  •  Pairs: 0 / 8';
-  document.getElementById('memoryStatus').textContent='Flip two cards to find a pair.';
-  const b=document.getElementById('memoryBoard'); b.innerHTML='';
-  deck.forEach((emoji,i)=>{
-    const c=document.createElement('div'); c.className='mcard'; c.textContent='?'; c.dataset.emoji=emoji; c.dataset.index=i;
-    c.onclick=()=>flipCard(c); b.appendChild(c);
-  });
-}
-function flipCard(card){
-  if(memLock||card.classList.contains('flipped')||card.classList.contains('matched')) return;
-  card.classList.add('flipped'); card.textContent=card.dataset.emoji; memFlipped.push(card);
-  if(memFlipped.length===2){
-    memMoves++; memLock=true;
-    const [a,b]=memFlipped;
-    if(a.dataset.emoji===b.dataset.emoji){
-      setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); memMatched++; memFlipped=[]; memLock=false;
-        document.getElementById('memoryScore').textContent='Moves: '+memMoves+'  •  Pairs: '+memMatched+' / 8';
-        if(memMatched===8) document.getElementById('memoryStatus').textContent='You found them all in '+memMoves+' moves! 🎉';
-      }, 300);
-    } else {
-      setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); a.textContent='?'; b.textContent='?'; memFlipped=[]; memLock=false;
-        document.getElementById('memoryScore').textContent='Moves: '+memMoves+'  •  Pairs: '+memMatched+' / 8';
-      }, 700);
-    }
-  }
-}
+let memFlipped, memMatched, memMoves, memLock;
+function startMemory(){ const deck=[...EMOJIS,...EMOJIS].sort(function(){return Math.random()-0.5;}); memFlipped=[]; memMatched=0; memMoves=0; memLock=false; $('memoryScore').textContent='Moves: 0 • Pairs: 0 / 8'; $('memoryStatus').textContent='Flip two cards to find a pair.'; const b=$('memoryBoard'); b.innerHTML=''; deck.forEach(function(emoji){ const c=document.createElement('div'); c.className='mcard'; c.textContent='?'; c.dataset.emoji=emoji; c.onclick=function(){ flipCard(c); }; b.appendChild(c); }); }
+function flipCard(card){ if(memLock||card.classList.contains('flipped')||card.classList.contains('matched')) return; card.classList.add('flipped'); card.textContent=card.dataset.emoji; memFlipped.push(card); if(memFlipped.length===2){ memMoves++; memLock=true; const a=memFlipped[0], b=memFlipped[1]; if(a.dataset.emoji===b.dataset.emoji){ setTimeout(function(){ a.classList.add('matched'); b.classList.add('matched'); memMatched++; memFlipped=[]; memLock=false; $('memoryScore').textContent='Moves: '+memMoves+' • Pairs: '+memMatched+' / 8'; if(memMatched===8) $('memoryStatus').textContent='You found them all in '+memMoves+' moves! 🎉'; },300); } else { setTimeout(function(){ a.classList.remove('flipped'); b.classList.remove('flipped'); a.textContent='?'; b.textContent='?'; memFlipped=[]; memLock=false; $('memoryScore').textContent='Moves: '+memMoves+' • Pairs: '+memMatched+' / 8'; },700); } } }
 startMemory();
+</script>
+
+<script>
+/* --- 4 Pong --- */
+let pongTimer=null, pongRunning=false, pongBall, pongP1, pongP2, pongS1=0, pongS2=0;
+function stopPong(){ pongRunning=false; clearInterval(pongTimer); }
+function startPong(){ pongS1=0; pongS2=0; pongBall={x:200,y:150,dx:3,dy:2}; pongP1=125; pongP2=125; pongRunning=true; clearInterval(pongTimer); pongTimer=setInterval(pongTick,16); }
+function pongTick(){ const c=$('pongCanvas'), x=c.getContext('2d'); pongBall.x+=pongBall.dx; pongBall.y+=pongBall.dy; if(pongBall.y<8||pongBall.y>292) pongBall.dy*=-1; pongP2+=((pongBall.y-25)-pongP2)*0.06; if(pongBall.x<18 && pongBall.y>pongP1 && pongBall.y<pongP1+50) pongBall.dx=Math.abs(pongBall.dx); if(pongBall.x>382 && pongBall.y>pongP2 && pongBall.y<pongP2+50) pongBall.dx=-Math.abs(pongBall.dx); if(pongBall.x<0){ pongS2++; pongBall={x:200,y:150,dx:3,dy:2}; } if(pongBall.x>400){ pongS1++; pongBall={x:200,y:150,dx:-3,dy:2}; } $('pongScore').textContent='You '+pongS1+' — '+pongS2+' Computer'; x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#fff'; x.fillRect(10,pongP1,8,50); x.fillRect(382,pongP2,8,50); x.beginPath(); x.arc(pongBall.x,pongBall.y,7,0,7); x.fill(); if(pongS1>=5||pongS2>=5){ stopPong(); $('pongScore').textContent=(pongS1>=5?'You win! 🎉':'Computer wins!')+' Final: '+pongS1+' — '+pongS2; } }
+$('pongCanvas').addEventListener('mousemove',function(e){ const r=e.target.getBoundingClientRect(); pongP1=((e.clientY-r.top)/r.height)*300-25; });
+$('pongCanvas').addEventListener('touchmove',function(e){ const r=e.target.getBoundingClientRect(); pongP1=((e.touches[0].clientY-r.top)/r.height)*300-25; e.preventDefault(); },{passive:false});
+/* --- 5 Breakout --- */
+let breakTimer=null, breakRunning=false, breakBall, breakPaddle=170, breakBricks=[], breakScore=0, breakLives=3;
+function stopBreak(){ breakRunning=false; clearInterval(breakTimer); }
+function startBreak(){ breakScore=0; breakLives=3; breakPaddle=170; breakBricks=[]; for(let r=0;r<3;r++) for(let c=0;c<6;c++) breakBricks.push({x:c*65+10,y:r*25+30,alive:true}); breakBall={x:200,y:250,dx:3,dy:-3}; breakRunning=true; clearInterval(breakTimer); breakTimer=setInterval(breakTick,16); updateBreak(); }
+function updateBreak(){ $('breakScore').textContent='Score: '+breakScore+' • Lives: '+breakLives; }
+function breakTick(){ const c=$('breakCanvas'), x=c.getContext('2d'); breakBall.x+=breakBall.dx; breakBall.y+=breakBall.dy; if(breakBall.x<5||breakBall.x>395) breakBall.dx*=-1; if(breakBall.y<5) breakBall.dy*=-1; if(breakBall.y>280 && breakBall.x>breakPaddle && breakBall.x<breakPaddle+70) breakBall.dy=-Math.abs(breakBall.dy); breakBricks.forEach(function(b){ if(b.alive && breakBall.x>b.x && breakBall.x<b.x+60 && breakBall.y>b.y && breakBall.y<b.y+20){ b.alive=false; breakBall.dy*=-1; breakScore+=10; updateBreak(); } }); if(breakBall.y>300){ breakLives--; updateBreak(); if(breakLives<=0){ stopBreak(); $('breakScore').textContent='Game over! Score: '+breakScore; return; } breakBall={x:200,y:250,dx:3,dy:-3}; } if(breakBricks.every(function(b){return !b.alive;})){ stopBreak(); $('breakScore').textContent='You cleared them all! Score: '+breakScore+' 🎉'; } x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#f59e0b'; breakBricks.forEach(function(b){ if(b.alive) x.fillRect(b.x,b.y,60,20); }); x.fillStyle='#fff'; x.fillRect(breakPaddle,285,70,10); x.beginPath(); x.arc(breakBall.x,breakBall.y,6,0,7); x.fill(); }
+$('breakCanvas').addEventListener('mousemove',function(e){ const r=e.target.getBoundingClientRect(); breakPaddle=((e.clientX-r.left)/r.width)*400-35; });
+$('breakCanvas').addEventListener('touchmove',function(e){ const r=e.target.getBoundingClientRect(); breakPaddle=((e.touches[0].clientX-r.left)/r.width)*400-35; e.preventDefault(); },{passive:false});
+/* --- 6 Flappy --- */
+let flapTimer=null, flapRunning=false, flapY=150, flapV=0, flapPipes=[], flapScoreN=0;
+function stopFlap(){ flapRunning=false; clearInterval(flapTimer); }
+function startFlap(){ flapY=150; flapV=0; flapPipes=[{x:400,gap:120}]; flapScoreN=0; flapRunning=true; clearInterval(flapTimer); flapTimer=setInterval(flapTick,20); }
+function flap(){ if(flapRunning) flapV=-6; }
+function flapTick(){ const c=$('flapCanvas'), x=c.getContext('2d'); flapV+=0.35; flapY+=flapV; flapPipes.forEach(function(p){ p.x-=3; if(p.x===200) flapScoreN++; }); if(flapPipes[flapPipes.length-1].x<200) flapPipes.push({x:400,gap:80+Math.random()*80}); if(flapPipes[0].x<-60) flapPipes.shift(); $('flapScore').textContent='Score: '+flapScoreN; let dead=flapY>290||flapY<0; flapPipes.forEach(function(p){ if(200>p.x-20 && 200<p.x+50 && (flapY<p.gap || flapY>p.gap+90)) dead=true; }); if(dead){ stopFlap(); $('flapScore').textContent='Game over! Score: '+flapScoreN; } x.fillStyle='#87ceeb'; x.fillRect(0,0,400,300); x.fillStyle='#16a34a'; flapPipes.forEach(function(p){ x.fillRect(p.x,0,50,p.gap); x.fillRect(p.x,p.gap+90,50,300); }); x.fillStyle='#fbbf24'; x.beginPath(); x.arc(200,flapY,14,0,7); x.fill(); }
+$('flapCanvas').addEventListener('click',flap); $('flapCanvas').addEventListener('touchstart',function(e){ e.preventDefault(); flap(); },{passive:false});
+/* --- 7 Minesweeper --- */
+let mineGrid=[], mineOver=false, mineRevealed=0;
+function initMines(){ mineOver=false; mineRevealed=0; $('mineScore').textContent='Mines: 10'; $('mineStatus').textContent='Tap a square to reveal it.'; const mines=new Set(); while(mines.size<10) mines.add(Math.floor(Math.random()*81)); mineGrid=[]; const b=$('mineBoard'); b.innerHTML=''; for(let i=0;i<81;i++){ const isMine=mines.has(i); let n=0; const r=Math.floor(i/9), col=i%9; for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){ const rr=r+dr, cc=col+dc; if(rr>=0&&rr<9&&cc>=0&&cc<9&&mines.has(rr*9+cc)) n++; } mineGrid.push({mine:isMine,n:n,rev:false,flag:false}); const d=document.createElement('div'); d.className='tile'; d.style.fontSize='1rem'; d.onclick=function(){ mineClick(i); }; d.oncontextmenu=function(e){ e.preventDefault(); mineFlag(i); }; b.appendChild(d); } }
+function mineClick(i){ if(mineOver) return; const cell=mineGrid[i]; if(cell.rev||cell.flag) return; cell.rev=true; mineRevealed++; const d=$('mineBoard').children[i]; d.style.background='#374151'; if(cell.mine){ d.textContent='💣'; $('mineStatus').textContent='Boom! Game over.'; mineOver=true; mineGrid.forEach(function(c,j){ if(c.mine) $('mineBoard').children[j].textContent='💣'; }); return; } if(cell.n) d.textContent=cell.n; if(mineRevealed===71){ $('mineStatus').textContent='You cleared the field! 🎉'; mineOver=true; } }
+function mineFlag(i){ const cell=mineGrid[i]; if(cell.rev||mineOver) return; cell.flag=!cell.flag; $('mineBoard').children[i].textContent=cell.flag?'🚩':''; }
+/* --- 8 Tetris Lite --- */
+const TET_SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
+let tetGrid, tetPiece, tetX, tetY, tetTimer=null, tetScoreN=0, tetLines=0, tetRunning=false;
+function drawTet(){ const c=$('tetCanvas'), x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,200,400); tetGrid.forEach(function(row,y){ row.forEach(function(v,xx){ if(v){ x.fillStyle='#a855f7'; x.fillRect(xx*20,y*20,19,19); } }); }); if(tetPiece) tetPiece.forEach(function(row,dy){ row.forEach(function(v,dx){ if(v){ x.fillStyle='#22d3ee'; x.fillRect((tetX+dx)*20,(tetY+dy)*20,19,19); } }); }); }
+function tetNew(){ tetPiece=JSON.parse(JSON.stringify(TET_SHAPES[Math.floor(Math.random()*TET_SHAPES.length)])); tetX=4; tetY=0; if(tetCollide()){ tetRunning=false; clearInterval(tetTimer); $('tetScore').textContent='Game over! Score: '+tetScoreN; } }
+function tetCollide(){ return tetPiece.some(function(row,dy){ return row.some(function(v,dx){ if(!v) return false; const nx=tetX+dx, ny=tetY+dy; return nx<0||nx>=10||ny>=20||(ny>=0&&tetGrid[ny][nx]); }); }); }
+function startTet(){ tetGrid=Array.from({length:20},function(){return Array(10).fill(0);}); tetScoreN=0; tetLines=0; tetRunning=true; tetNew(); $('tetScore').textContent='Score: 0 • Lines: 0'; clearInterval(tetTimer); tetTimer=setInterval(tetStep,600); drawTet(); }
+function tetStep(){ if(!tetRunning) return; tetY++; if(tetCollide()){ tetY--; tetPiece.forEach(function(row,dy){ row.forEach(function(v,dx){ if(v&&tetY+dy>=0) tetGrid[tetY+dy][tetX+dx]=1; }); }); tetGrid=tetGrid.filter(function(r){return r.some(function(v){return !v;});}); const cleared=20-tetGrid.length; while(tetGrid.length<20) tetGrid.unshift(Array(10).fill(0)); tetLines+=cleared; tetScoreN+=cleared*100; $('tetScore').textContent='Score: '+tetScoreN+' • Lines: '+tetLines; tetNew(); } drawTet(); }
+function tetMove(d){ if(!tetRunning) return; tetX+=d; if(tetCollide()) tetX-=d; drawTet(); }
+function tetRotate(){ if(!tetRunning) return; const old=tetPiece; tetPiece=tetPiece[0].map(function(_,i){ return tetPiece.map(function(r){return r[i];}).reverse(); }); if(tetCollide()) tetPiece=old; drawTet(); }
+function tetDrop(){ if(!tetRunning) return; tetStep(); }
+tetGrid=Array.from({length:20},function(){return Array(10).fill(0);}); tetPiece=TET_SHAPES[1]; tetX=4; tetY=0; drawTet();
+/* --- 9 Simon --- */
+let simonSeq=[], simonIdx=0, simonPlaying=false, simonRound=0;
+function startSimon(){ simonSeq=[]; simonRound=0; simonNext(); }
+function simonNext(){ simonRound++; $('simonScore').textContent='Round: '+simonRound; simonSeq.push(Math.floor(Math.random()*4)); simonIdx=0; simonPlaying=true; $('simonStatus').textContent='Watch...'; let i=0; const t=setInterval(function(){ if(i>=simonSeq.length){ clearInterval(t); simonPlaying=false; $('simonStatus').textContent='Your turn — repeat it!'; return; } simonLight(simonSeq[i]); i++; },600); }
+function simonLight(n){ const b=$('simon'+n); b.classList.add('lit'); audioTone([330,392,440,523][n],0.3,'sine',0.25); setTimeout(function(){ b.classList.remove('lit'); },350); }
+function simonPress(n){ if(simonPlaying) return; simonLight(n); if(n===simonSeq[simonIdx]){ simonIdx++; if(simonIdx===simonSeq.length) setTimeout(simonNext,600); } else { $('simonStatus').textContent='Wrong! You reached round '+simonRound+'. Press Start to try again.'; simonPlaying=true; } }
+/* --- 10 Whack --- */
+let whackTimer=null, whackScoreN=0, whackTime=30, whackActive=-1;
+function buildWhack(){ const b=$('whackBoard'); if(b.children.length) return; for(let i=0;i<9;i++){ const d=document.createElement('div'); d.className='tile'; d.style.fontSize='2rem'; d.onclick=function(){ if(i===whackActive){ whackScoreN++; $('whackScore').textContent='Score: '+whackScoreN+' • Time: '+whackTime+'s'; d.textContent=''; whackActive=-1; } }; b.appendChild(d); } }
+function startWhack(){ buildWhack(); whackScoreN=0; whackTime=30; $('whackScore').textContent='Score: 0 • Time: 30s'; clearInterval(whackTimer); whackTimer=regTimer(setInterval(function(){ whackTime--; $('whackScore').textContent='Score: '+whackScoreN+' • Time: '+whackTime+'s'; if(whackTime<=0){ clearInterval(whackTimer); $('whackStatus').textContent='Time up! You scored '+whackScoreN+'!'; } },1000)); const mole=setInterval(function(){ if(whackTime<=0){ clearInterval(mole); return; } document.querySelectorAll('#whackBoard .tile').forEach(function(t){ t.textContent=''; }); whackActive=Math.floor(Math.random()*9); $('whackBoard').children[whackActive].textContent='🐹'; },700); }
+/* --- 11 RPS --- */
+let rpsS1=0, rpsS2=0;
+function playRPS(p){ const c=['rock','paper','scissors'][Math.floor(Math.random()*3)]; const e={rock:'🪨',paper:'📄',scissors:'✂️'}; $('rpsResult').textContent=e[p]+' vs '+e[c]; let r='Draw!'; if((p==='rock'&&c==='scissors')||(p==='paper'&&c==='rock')||(p==='scissors'&&c==='paper')){ r='You win! 🎉'; rpsS1++; } else if(p!==c){ r='Computer wins!'; rpsS2++; } $('rpsStatus').textContent=r; $('rpsScore').textContent='You '+rpsS1+' — '+rpsS2+' Computer'; }
+/* --- 12 Hangman --- */
+const HANG_WORDS=['APPLE','BANANA','ORANGE','GUITAR','PYTHON','ROCKET','PLANET','OCEAN','TIGER','PIZZA','SCHOOL','FRIEND'];
+let hangWord='', hangGuessed=[], hangLives=6;
+function initHang(){ hangWord=HANG_WORDS[Math.floor(Math.random()*HANG_WORDS.length)]; hangGuessed=[]; hangLives=6; $('hangLives').textContent='Lives: 6'; $('hangStatus').textContent=''; renderHang(); const k=$('hangKeys'); k.innerHTML=''; 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(L){ const b=document.createElement('button'); b.textContent=L; b.onclick=function(){ hangGuess(L,b); }; k.appendChild(b); }); }
+function renderHang(){ $('hangWord').textContent=hangWord.split('').map(function(L){ return hangGuessed.includes(L)?L:'_'; }).join(' '); }
+function hangGuess(L,b){ b.disabled=true; if(hangWord.includes(L)){ hangGuessed.push(L); renderHang(); if(hangWord.split('').every(function(x){return hangGuessed.includes(x);})){ $('hangStatus').textContent='You guessed it! 🎉 The word was '+hangWord; } } else { hangLives--; $('hangLives').textContent='Lives: '+hangLives; if(hangLives<=0) $('hangStatus').textContent='Out of lives! The word was '+hangWord; } }
+/* --- 13 Wordle --- */
+const WORDLE_WORDS=['APPLE','BRAIN','CLOUD','DANCE','EAGLE','FLAME','GRAPE','HOUSE','LIGHT','MUSIC','PIZZA','QUEEN','RIVER','STONE','TIGER','WATER'];
+let wordleWord='', wordleRow=0, wordleOver=false;
+function initWordle(){ wordleWord=WORDLE_WORDS[Math.floor(Math.random()*WORDLE_WORDS.length)]; wordleRow=0; wordleOver=false; $('wordleStatus').textContent=''; $('wordleBoard').innerHTML=''; for(let i=0;i<6;i++){ const r=document.createElement('div'); r.className='wordrow'; for(let j=0;j<5;j++){ const c=document.createElement('div'); c.className='wordcell'; r.appendChild(c); } $('wordleBoard').appendChild(r); } }
+function guessWordle(){ if(wordleOver) return; const g=$('wordleInput').value.toUpperCase().trim(); if(g.length!==5){ $('wordleStatus').textContent='Enter a 5-letter word!'; return; } const row=$('wordleBoard').children[wordleRow]; for(let i=0;i<5;i++){ const c=row.children[i]; c.textContent=g[i]; if(g[i]===wordleWord[i]) c.classList.add('g'); else if(wordleWord.includes(g[i])) c.classList.add('y'); else c.classList.add('x'); } if(g===wordleWord){ $('wordleStatus').textContent='You got it! 🎉'; wordleOver=true; return; } wordleRow++; $('wordleInput').value=''; if(wordleRow>=6){ $('wordleStatus').textContent='Out of tries! The word was '+wordleWord; wordleOver=true; } }
+/* --- 14 Connect Four --- */
+let c4Grid, c4Turn, c4Over;
+function initC4(){ c4Grid=Array.from({length:6},function(){return Array(7).fill('');}); c4Turn='🔴'; c4Over=false; $('c4Status').textContent="Your turn — you're 🔴"; renderC4(); }
+function renderC4(){ const b=$('c4Board'); b.innerHTML=''; c4Grid.forEach(function(row,r){ row.forEach(function(v,c){ const d=document.createElement('div'); d.className='tile'; d.textContent=v||'⚪'; d.onclick=function(){ c4Drop(c); }; b.appendChild(d); }); }); }
+function c4Drop(c){ if(c4Over) return; let r=5; while(r>=0&&c4Grid[r][c]) r--; if(r<0) return; c4Grid[r][c]=c4Turn; renderC4(); if(c4Win(r,c)){ $('c4Status').textContent=c4Turn+' wins! 🎉'; c4Over=true; return; } if(c4Grid.every(function(row){return row.every(Boolean);})){ $('c4Status').textContent="It's a draw!"; c4Over=true; return; } c4Turn=c4Turn==='🔴'?'🟡':'🔴'; $('c4Status').textContent=c4Turn==='🔴'?"Your turn — you're 🔴":'Computer is thinking…'; if(c4Turn==='🟡') setTimeout(function(){ const cols=[0,1,2,3,4,5,6].filter(function(cc){return !c4Grid[0][cc];}); c4Drop(cols[Math.floor(Math.random()*cols.length)]); },400); }
+function c4Win(r,c){ const p=c4Grid[r][c]; const dirs=[[0,1],[1,0],[1,1],[1,-1]]; return dirs.some(function(d){ let n=1; for(let s=1;s<4;s++){ const rr=r+d[0]*s, cc=c+d[1]*s; if(rr<0||rr>=6||cc<0||cc>=7||c4Grid[rr][cc]!==p) break; n++; } for(let s=1;s<4;s++){ const rr=r-d[0]*s, cc=c-d[1]*s; if(rr<0||rr>=6||cc<0||cc>=7||c4Grid[rr][cc]!==p) break; n++; } return n>=4; }); }
+/* --- 15 Sudoku --- */
+const SUD_PUZZLE=[[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]];
+const SUD_SOL=[[5,3,4,6,7,8,9,1,2],[6,7,2,1,9,5,3,4,8],[1,9,8,3,4,2,5,6,7],[8,5,9,7,6,1,4,2,3],[4,2,6,8,5,3,7,9,1],[7,1,3,9,2,4,8,5,6],[9,6,1,5,3,7,2,8,4],[2,8,7,4,1,9,6,3,5],[3,4,5,2,8,6,1,7,9]];
+function initSudoku(){ const b=$('sudokuBoard'); b.innerHTML=''; SUD_PUZZLE.forEach(function(row,r){ row.forEach(function(v,c){ const inp=document.createElement('input'); inp.type='number'; inp.min=1; inp.max=9; inp.dataset.r=r; inp.dataset.c=c; if(v){ inp.value=v; inp.disabled=true; inp.classList.add('fixed'); } b.appendChild(inp); }); }); $('sudokuStatus').textContent='Fill 1–9 in every row, column and 3×3 box.'; }
+function checkSudoku(){ let ok=true; document.querySelectorAll('#sudokuBoard input').forEach(function(inp){ const r=+inp.dataset.r, c=+inp.dataset.c; if(+inp.value!==SUD_SOL[r][c]) ok=false; }); $('sudokuStatus').textContent=ok?'Perfect! You solved it! 🎉':'Not quite yet — check the red ones and try again.'; }
+/* --- 16 2048 --- */
+let g2048, s2048=0;
+function init2048(){ g2048=Array.from({length:4},function(){return Array(4).fill(0);}); s2048=0; add2048(); add2048(); render2048(); }
+function add2048(){ const e=[]; g2048.forEach(function(r,i){ r.forEach(function(v,j){ if(!v) e.push([i,j]); }); }); if(!e.length) return; const p=e[Math.floor(Math.random()*e.length)]; g2048[p[0]][p[1]]=Math.random()<0.9?2:4; }
+function render2048(){ $('s2048').textContent='Score: '+s2048; const b=$('b2048'); b.innerHTML=''; g2048.forEach(function(row){ row.forEach(function(v){ const d=document.createElement('div'); d.className='tile'; d.textContent=v||''; d.style.background=v?'#2563eb':'#1f2937'; d.style.fontWeight='bold'; b.appendChild(d); }); }); }
+function move2048(dir){ let moved=false; const slide=function(arr){ let a=arr.filter(function(v){return v;}); for(let i=0;i<a.length-1;i++){ if(a[i]===a[i+1]){ a[i]*=2; s2048+=a[i]; a.splice(i+1,1); } } while(a.length<4) a.push(0); return a; }; for(let i=0;i<4;i++){ let line=[]; if(dir==='left') line=g2048[i]; if(dir==='right') line=[...g2048[i]].reverse(); if(dir==='up') line=g2048.map(function(r){return r[i];}); if(dir==='down') line=g2048.map(function(r){return r[i];}).reverse(); const nl=slide(line); const old=line.join(','); if(nl.join(',')!==old) moved=true; if(dir==='left') g2048[i]=nl; if(dir==='right') g2048[i]=[...nl].reverse(); if(dir==='up') nl.forEach(function(v,j){ g2048[j][i]=v; }); if(dir==='down') nl.forEach(function(v,j){ g2048[3-j][i]=v; }); } if(moved){ add2048(); render2048(); if(g2048.flat().includes(2048)) $('s2048').textContent='You reached 2048! 🎉 Score: '+s2048; } }
+</script>
+
+<script>
+/* --- 17 Dice --- */
+function rollDice(n){ const d=[]; let total=0; for(let i=0;i<n;i++){ const v=1+Math.floor(Math.random()*6); d.push(v); total+=v; } const faces=['','⚀','⚁','⚂','⚃','⚄','⚅']; $('diceResult').textContent=d.map(function(v){return faces[v];}).join(' '); $('diceStatus').textContent='Total: '+total; }
+/* --- 18 Coin --- */
+let coinH=0, coinT=0;
+function flipCoin(){ const h=Math.random()<0.5; if(h) coinH++; else coinT++; $('coinResult').textContent=h?'👑 Heads!':'🔢 Tails!'; $('coinScore').textContent='Heads: '+coinH+' • Tails: '+coinT; }
+/* --- 19 Calculator --- */
+let calcExpr='';
+function calcPress(k){ if(calcExpr==='0'||calcExpr==='Error') calcExpr=''; calcExpr+=k; $('calcDisplay').value=calcExpr; }
+function calcClear(){ calcExpr=''; $('calcDisplay').value='0'; }
+function calcEq(){ try{ const v=Function('"use strict"; return ('+calcExpr.replace(/[^0-9+\-*/.() ]/g,'')+')')(); calcExpr=String(Math.round(v*100000)/100000); $('calcDisplay').value=calcExpr; }catch(e){ calcExpr=''; $('calcDisplay').value='Error'; } }
+/* --- 20 Stopwatch --- */
+let swT=0, swTimer=null, swStartAt=0;
+function swFmt(){ const t=swT; const m=String(Math.floor(t/60000)).padStart(2,'0'), s=String(Math.floor(t/1000)%60).padStart(2,'0'), d=Math.floor(t/100)%10; return m+':'+s+'.'+d; }
+function swStart(){ if(swTimer) return; swStartAt=Date.now()-swT; swTimer=setInterval(function(){ swT=Date.now()-swStartAt; $('swDisplay').textContent=swFmt(); },100); }
+function swStop(){ clearInterval(swTimer); swTimer=null; }
+function swReset(){ swStop(); swT=0; $('swDisplay').textContent='00:00.0'; }
+/* --- 21 Countdown --- */
+let cdTimer=null, cdLeft=0;
+function cdStart(){ cdLeft=(+$('cdMin').value||5)*60; $('cdStatus').textContent=''; clearInterval(cdTimer); cdTimer=regTimer(setInterval(function(){ cdLeft--; const m=String(Math.floor(cdLeft/60)).padStart(2,'0'), s=String(cdLeft%60).padStart(2,'0'); $('cdDisplay').textContent=m+':'+s; if(cdLeft<=0){ clearInterval(cdTimer); $('cdStatus').textContent="Time's up! ⏰"; audioTone(880,0.5); } },1000)); }
+function cdStop(){ clearInterval(cdTimer); }
+/* --- 22 Drawing --- */
+(function(){ const c=$('drawCanvas'); if(!c) return; const x=c.getContext('2d'); let drawing=false; function pos(e){ const r=c.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:(t.clientX-r.left)*(c.width/r.width), y:(t.clientY-r.top)*(c.height/r.height)}; } c.addEventListener('mousedown',function(e){ drawing=true; const p=pos(e); x.beginPath(); x.moveTo(p.x,p.y); }); c.addEventListener('mousemove',function(e){ if(!drawing) return; const p=pos(e); x.strokeStyle=$('drawColor').value; x.lineWidth=4; x.lineTo(p.x,p.y); x.stroke(); }); window.addEventListener('mouseup',function(){ drawing=false; }); c.addEventListener('touchstart',function(e){ e.preventDefault(); drawing=true; const p=pos(e); x.beginPath(); x.moveTo(p.x,p.y); },{passive:false}); c.addEventListener('touchmove',function(e){ e.preventDefault(); if(!drawing) return; const p=pos(e); x.strokeStyle=$('drawColor').value; x.lineWidth=4; x.lineTo(p.x,p.y); x.stroke(); },{passive:false}); })();
+function drawClear(){ const c=$('drawCanvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+/* --- 23 Color --- */
+function updateColor(){ const v=$('colorInput').value; $('colorHex').textContent=v; $('colorSwatch').style.background=v; }
+function randomColor(){ const v='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'); $('colorInput').value=v; updateColor(); }
+$('colorInput').addEventListener('input',updateColor);
+/* --- 24 Notes --- */
+function loadNote(){ try{ $('noteText').value=localStorage.getItem('idk-note')||''; }catch(e){} }
+function saveNote(){ try{ localStorage.setItem('idk-note',$('noteText').value); $('noteStatus').textContent='Saved! ✓'; }catch(e){ $('noteStatus').textContent='Saved for this session.'; } }
+function clearNote(){ $('noteText').value=''; saveNote(); }
+/* --- 25 Todo --- */
+let todos=[];
+function renderTodo(){ try{ todos=JSON.parse(localStorage.getItem('idk-todos')||'[]'); }catch(e){ todos=[]; } const b=$('todoList'); b.innerHTML=''; todos.forEach(function(t,i){ const d=document.createElement('div'); d.className='todoitem'+(t.done?' done':''); const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!t.done; cb.style.width='auto'; cb.onchange=function(){ todos[i].done=cb.checked; saveTodos(); }; const s=document.createElement('span'); s.textContent=t.text; const del=document.createElement('button'); del.textContent='✕'; del.className='secondary'; del.onclick=function(){ todos.splice(i,1); saveTodos(); }; d.appendChild(cb); d.appendChild(s); d.appendChild(del); b.appendChild(d); }); }
+function saveTodos(){ try{ localStorage.setItem('idk-todos',JSON.stringify(todos)); }catch(e){} renderTodo(); }
+function addTodo(){ const v=$('todoInput').value.trim(); if(!v) return; todos.push({text:v,done:false}); $('todoInput').value=''; saveTodos(); }
+/* --- 26 Quote --- */
+const QUOTES=[['The best way to predict the future is to invent it.','Alan Kay'],['It does not matter how slowly you go as long as you do not stop.','Confucius'],['Believe you can and you\'re halfway there.','Theodore Roosevelt'],['The only way to do great work is to love what you do.','Steve Jobs'],['Stay hungry, stay foolish.','Stewart Brand'],['You miss 100% of the shots you don\'t take.','Wayne Gretzky'],['Do what you can, with what you have, where you are.','Theodore Roosevelt'],['It always seems impossible until it\'s done.','Nelson Mandela']];
+function newQuote(){ const q=QUOTES[Math.floor(Math.random()*QUOTES.length)]; $('quoteText').textContent='“'+q[0]+'”'; $('quoteAuthor').textContent='— '+q[1]; }
+/* --- 27 Joke --- */
+const JOKES=['Why did the scarecrow win an award? Because he was outstanding in his field!','Why don\'t scientists trust atoms? Because they make up everything!','What do you call a fish without eyes? A fsh!','Why did the math book look sad? It had too many problems.','What\'s orange and sounds like a parrot? A carrot!','Why did the bicycle fall over? It was two-tired!','How does a penguin build its house? Igloos it together!','What do you call cheese that isn\'t yours? Nacho cheese!'];
+function newJoke(){ $('jokeText').textContent=JOKES[Math.floor(Math.random()*JOKES.length)]; }
+/* --- 28 Password --- */
+function genPassword(){ const len=+$('pwLen').value||12; const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*'; let p=''; for(let i=0;i<len;i++) p+=chars[Math.floor(Math.random()*chars.length)]; $('pwResult').textContent=p; $('pwStatus').textContent=''; }
+function copyPw(){ const t=$('pwResult').textContent; if(!t||t==='—') return; if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ $('pwStatus').textContent='Copied! ✓'; }); }
+/* --- 29 Converter --- */
+function doConvert(){ const v=+$('convIn').value||0, t=$('convType').value; const m={'m-ft':v*3.28084,'ft-m':v/3.28084,'kg-lb':v*2.20462,'lb-kg':v/2.20462,'c-f':v*9/5+32,'f-c':(v-32)*5/9,'km-mi':v*0.621371,'mi-km':v/0.621371}; $('convOut').textContent=Math.round(m[t]*100)/100; }
+/* --- 30 BMI --- */
+function calcBMI(){ const h=(+$('bmiH').value)/100, w=+$('bmiW').value; if(!h||!w){ $('bmiOut').textContent='Enter height and weight'; return; } const bmi=w/(h*h); $('bmiOut').textContent='BMI: '+(Math.round(bmi*10)/10); $('bmiCat').textContent=bmi<18.5?'Underweight':bmi<25?'Healthy weight':bmi<30?'Overweight':'Obese'; }
+/* --- 31 Tip --- */
+function calcTip(){ const bill=+$('tipBill').value||0, pct=+$('tipPct').value||0, split=+$('tipSplit').value||1; const tip=bill*pct/100; $('tipOut').textContent='Tip: $'+tip.toFixed(2)+' • Total: $'+(bill+tip).toFixed(2)+' • Each: $'+((bill+tip)/split).toFixed(2); }
+/* --- 32 Pomodoro --- */
+let pomTimer=null, pomLeft=25*60, pomFocus=true;
+function pomRender(){ const m=String(Math.floor(pomLeft/60)).padStart(2,'0'), s=String(pomLeft%60).padStart(2,'0'); $('pomDisplay').textContent=m+':'+s; }
+function pomStart(){ clearInterval(pomTimer); pomTimer=regTimer(setInterval(function(){ pomLeft--; pomRender(); if(pomLeft<=0){ clearInterval(pomTimer); $('pomStatus').textContent=pomFocus?'Focus done! Take a break. 🎉':'Break over! Back to focus.'; audioTone(880,0.5); } },1000)); }
+function pomStop(){ clearInterval(pomTimer); }
+function pomSwitch(){ pomFocus=!pomFocus; pomLeft=pomFocus?25*60:5*60; $('pomStatus').textContent=pomFocus?'Focus time — work for 25 minutes!':'Break time — relax for 5 minutes!'; pomRender(); }
+/* --- 33 Reaction --- */
+let reactTimer=null, reactStart=0, reactState='idle';
+function startReact(){ const b=$('reactBox'); b.style.background='#dc2626'; b.textContent='Wait for green...'; reactState='waiting'; reactTimer=regTimer(setTimeout(function(){ b.style.background='#16a34a'; b.textContent='TAP NOW!'; reactStart=Date.now(); reactState='green'; },1000+Math.random()*3000)); }
+function reactClick(){ const b=$('reactBox'); if(reactState==='waiting'){ clearTimeout(reactTimer); b.style.background='#374151'; b.textContent='Too soon! Press Start and wait for green.'; reactState='idle'; } else if(reactState==='green'){ const ms=Date.now()-reactStart; $('reactScore').textContent='Your reaction time: '+ms+' ms!'; b.style.background='#374151'; b.textContent='Tap Start to try again!'; reactState='idle'; } }
+/* --- 34 Typing --- */
+const TYPE_SENTENCES=['The quick brown fox jumps over the lazy dog.','Practice makes perfect and hard work pays off.','Coding is fun when you build things you love.','A journey of a thousand miles begins with a single step.'];
+let typeStart=0, typeSentence='';
+function startTyping(){ typeSentence=TYPE_SENTENCES[Math.floor(Math.random()*TYPE_SENTENCES.length)]; $('typeSentence').textContent=typeSentence; $('typeInput').value=''; $('typeScore').textContent=''; typeStart=Date.now(); $('typeInput').focus(); }
+function checkTyping(){ const typed=$('typeInput').value.trim(); const mins=(Date.now()-typeStart)/60000; const words=typed.split(/\s+/).filter(Boolean).length; const wpm=Math.round(words/Math.max(mins,0.01)); let correct=0; for(let i=0;i<Math.min(typed.length,typeSentence.length);i++) if(typed[i]===typeSentence[i]) correct++; const acc=Math.round(correct/Math.max(typeSentence.length,1)*100); $('typeScore').textContent='Speed: '+wpm+' WPM • Accuracy: '+acc+'%'; }
+/* --- 35 Click Speed --- */
+let clickN=0, clickTimer=null, clickLeft=10, clickRunning=false;
+function startClick(){ clickN=0; clickLeft=10; clickRunning=true; $('clickScore').textContent='Clicks: 0 • Time left: 10s'; clearInterval(clickTimer); clickTimer=regTimer(setInterval(function(){ clickLeft--; $('clickScore').textContent='Clicks: '+clickN+' • Time left: '+clickLeft+'s'; if(clickLeft<=0){ clearInterval(clickTimer); clickRunning=false; $('clickScore').textContent='Time up! You clicked '+clickN+' times — '+(clickN/10).toFixed(1)+' per second!'; } },1000)); }
+function clickSpeed(){ if(!clickRunning) return; clickN++; $('clickScore').textContent='Clicks: '+clickN+' • Time left: '+clickLeft+'s'; }
+</script>
+
+<script>
+/* --- 36 Guessing --- */
+let guessTarget=0, guessN=0;
+function initGuess(){ guessTarget=1+Math.floor(Math.random()*100); guessN=0; $('guessStatus').textContent=''; $('guessCount').textContent=''; $('guessInput').value=''; }
+function makeGuess(){ const g=+$('guessInput').value; if(!g){ $('guessStatus').textContent='Enter a number!'; return; } guessN++; if(g===guessTarget){ $('guessStatus').textContent='Correct! 🎉 It was '+guessTarget; $('guessCount').textContent='You got it in '+guessN+' tries!'; } else if(g<guessTarget){ $('guessStatus').textContent='Too low — try higher!'; } else { $('guessStatus').textContent='Too high — try lower!'; } $('guessCount').textContent='Tries: '+guessN; }
+/* --- 37 Higher or Lower --- */
+let hlCurrent=0, hlScoreN=0, hlStreak=0;
+function initHL(){ hlCurrent=1+Math.floor(Math.random()*13); hlScoreN=0; hlStreak=0; renderHL(); $('hlStatus').textContent='Will the next card be higher or lower?'; }
+function renderHL(){ const names=['','A','2','3','4','5','6','7','8','9','10','J','Q','K']; $('hlCard').textContent=names[hlCurrent]; $('hlScore').textContent='Score: '+hlScoreN+' • Streak: '+hlStreak; }
+function hlGuess(dir){ const next=1+Math.floor(Math.random()*13); let win=false; if(next===hlCurrent){ $('hlStatus').textContent='Same card! No points, try again.'; hlCurrent=next; renderHL(); return; } if((dir==='higher'&&next>hlCurrent)||(dir==='lower'&&next<hlCurrent)) win=true; hlCurrent=next; if(win){ hlScoreN++; hlStreak++; $('hlStatus').textContent='Correct! 🎉'; } else { hlStreak=0; $('hlStatus').textContent='Wrong! The card was '+hlCurrent+'.'; } renderHL(); }
+/* --- 38 Trivia --- */
+const TRIVIA=[['What is the capital of France?',['London','Paris','Rome','Berlin'],1],['How many days are in a leap year?',['365','366','364','367'],1],['What planet is known as the Red Planet?',['Venus','Jupiter','Mars','Saturn'],2],['What is 7 x 8?',['54','56','48','64'],1],['Which animal is known as man\'s best friend?',['Cat','Horse','Dog','Parrot'],2]];
+let triviaIdx=0, triviaScore=0;
+function initTrivia(){ triviaIdx=0; triviaScore=0; renderTrivia(); }
+function renderTrivia(){ const b=$('triviaBox'); if(triviaIdx>=TRIVIA.length){ b.innerHTML='<div class="big">You scored '+triviaScore+' / '+TRIVIA.length+'! 🎉</div>'; return; } const q=TRIVIA[triviaIdx]; b.innerHTML='<p style="font-size:1.2rem">Q'+(triviaIdx+1)+': '+q[0]+'</p>'; q[1].forEach(function(opt,i){ const btn=document.createElement('button'); btn.className='quizopt'; btn.textContent=opt; btn.onclick=function(){ if(i===q[2]) triviaScore++; triviaIdx++; renderTrivia(); }; b.appendChild(btn); }); }
+/* --- 39 Math Quiz --- */
+let mathIdx=0, mathCorrect=0, mathAns=0;
+function initMath(){ mathIdx=0; mathCorrect=0; nextMath(); }
+function nextMath(){ if(mathIdx>=10){ $('mathQ').textContent='Done! You got '+mathCorrect+' / 10! 🎉'; $('mathScore').textContent='Quiz finished'; return; } const a=1+Math.floor(Math.random()*12), b=1+Math.floor(Math.random()*12), op=['+','-','×'][Math.floor(Math.random()*3)]; mathAns=op==='+'?a+b:op==='-'?a-b:a*b; $('mathQ').textContent=a+' '+op+' '+b+' = ?'; $('mathScore').textContent='Question '+(mathIdx+1)+'/10 • Correct: '+mathCorrect; $('mathAns').value=''; $('mathStatus').textContent=''; }
+function mathCheck(){ if(mathIdx>=10) return; if(+$('mathAns').value===mathAns){ mathCorrect++; $('mathStatus').textContent='Correct! ✅'; } else { $('mathStatus').textContent='Not quite — the answer was '+mathAns; } mathIdx++; setTimeout(nextMath,700); }
+/* --- 40 Scramble --- */
+const SCR_WORDS=['APPLE','BANANA','GUITAR','ROCKET','PLANET','PIZZA','TIGER','OCEAN','SCHOOL','FRIEND','COMPUTER','RAINBOW'];
+let scrWord='', scrScoreN=0;
+function newScramble(){ scrWord=SCR_WORDS[Math.floor(Math.random()*SCR_WORDS.length)]; const s=scrWord.split('').sort(function(){return Math.random()-0.5;}).join(''); $('scrWord').textContent=s.split('').join(' '); $('scrInput').value=''; $('scrStatus').textContent=''; }
+function checkScramble(){ const g=$('scrInput').value.toUpperCase().trim(); if(g===scrWord){ scrScoreN++; $('scrScore').textContent='Score: '+scrScoreN; $('scrStatus').textContent='Correct! 🎉'; setTimeout(newScramble,800); } else { $('scrStatus').textContent='Not quite — try again!'; } }
+/* --- 41 Bubble Pop --- */
+let bubTimer=null, bubScoreN=0, bubTime=30, bubSpawn=null;
+function startBubble(){ bubScoreN=0; bubTime=30; $('bubScore').textContent='Popped: 0 • Time: 30s'; $('bubArea').innerHTML=''; clearInterval(bubTimer); clearInterval(bubSpawn); bubSpawn=setInterval(function(){ if(bubTime<=0) return; const b=document.createElement('div'); b.textContent='🫧'; b.style.cssText='position:absolute;font-size:2.5rem;cursor:pointer;left:'+(Math.random()*85)+'%;top:'+(Math.random()*75)+'%;'; b.onclick=function(){ bubScoreN++; $('bubScore').textContent='Popped: '+bubScoreN+' • Time: '+bubTime+'s'; b.remove(); }; $('bubArea').appendChild(b); setTimeout(function(){ if(b.parentNode) b.remove(); },1500); },600); bubTimer=regTimer(setInterval(function(){ bubTime--; $('bubScore').textContent='Popped: '+bubScoreN+' • Time: '+bubTime+'s'; if(bubTime<=0){ clearInterval(bubTimer); clearInterval(bubSpawn); $('bubArea').innerHTML='<div class="big">Time up! You popped '+bubScoreN+' bubbles! 🎉</div>'; } },1000)); }
+/* --- 42 Catch --- */
+let catchTimer=null, catchRunning=false, catchX=170, catchItems=[], catchCaught=0, catchMissed=0;
+function startCatch(){ catchCaught=0; catchMissed=0; catchX=170; catchItems=[]; catchRunning=true; clearInterval(catchTimer); catchTimer=setInterval(catchTick,30); updateCatch(); }
+function updateCatch(){ $('catchScore').textContent='Caught: '+catchCaught+' • Missed: '+catchMissed; }
+function catchTick(){ const c=$('catchCanvas'), x=c.getContext('2d'); if(Math.random()<0.03) catchItems.push({x:Math.random()*370,y:0,e:['🍎','🍊','🍇','🍓'][Math.floor(Math.random()*4)]}); catchItems.forEach(function(it){ it.y+=3; }); catchItems=catchItems.filter(function(it){ if(it.y>260){ if(it.x>catchX-10&&it.x<catchX+70){ catchCaught++; } else { catchMissed++; } updateCatch(); return false; } return true; }); if(catchMissed>=5){ catchRunning=false; clearInterval(catchTimer); $('catchScore').textContent='Game over! You caught '+catchCaught+'!'; } x.fillStyle='#000'; x.fillRect(0,0,400,300); x.font='24px sans-serif'; catchItems.forEach(function(it){ x.fillText(it.e,it.x,it.y); }); x.fillStyle='#8b5cf6'; x.fillRect(catchX,275,70,15); }
+$('catchCanvas').addEventListener('mousemove',function(e){ const r=e.target.getBoundingClientRect(); catchX=((e.clientX-r.left)/r.width)*400-35; });
+$('catchCanvas').addEventListener('touchmove',function(e){ const r=e.target.getBoundingClientRect(); catchX=((e.touches[0].clientX-r.left)/r.width)*400-35; e.preventDefault(); },{passive:false});
+/* --- 43 Maze --- */
+const MAZE=[[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,1,0,1,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,1,0,1],[1,0,0,0,0,1,0,0,0,1],[1,1,1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,0,0,1],[1,1,1,1,1,1,1,1,1,1]];
+let mazePos={x:1,y:1};
+function initMaze(){ mazePos={x:1,y:1}; $('mazeStatus').textContent='Use arrow keys or the buttons to reach the green square.'; drawMaze(); }
+function drawMaze(){ const c=$('mazeCanvas'), x=c.getContext('2d'); MAZE.forEach(function(row,y){ row.forEach(function(v,xx){ x.fillStyle=v?'#1f2937':'#fff'; x.fillRect(xx*40,y*40,40,40); }); }); x.fillStyle='#22c55e'; x.fillRect(8*40,8*40,40,40); x.fillStyle='#ef4444'; x.beginPath(); x.arc(mazePos.x*40+20,mazePos.y*40+20,14,0,7); x.fill(); }
+function mazeMove(dx,dy){ const nx=mazePos.x+dx, ny=mazePos.y+dy; if(MAZE[ny]&&MAZE[ny][nx]===0){ mazePos={x:nx,y:ny}; drawMaze(); if(nx===8&&ny===8) $('mazeStatus').textContent='You escaped the maze! 🎉'; } }
+/* --- 44/45 Piano & Drum are in the shared helpers above --- */
+/* --- 46 Slots --- */
+let slotCredits=100;
+function spinSlots(){ if(slotCredits<10){ $('slotStatus').textContent='Out of credits! Refresh the page to start again.'; return; } slotCredits-=10; const sym=['🍒','🍋','⭐','🔔','🍇','💎']; const r=[sym[Math.floor(Math.random()*6)],sym[Math.floor(Math.random()*6)],sym[Math.floor(Math.random()*6)]]; $('slotResult').textContent=r.join(' '); if(r[0]===r[1]&&r[1]===r[2]){ slotCredits+=50; $('slotStatus').textContent='JACKPOT! +50 credits! 🎉'; } else if(r[0]===r[1]||r[1]===r[2]||r[0]===r[2]){ slotCredits+=20; $('slotStatus').textContent='Two match! +20 credits!'; } else { $('slotStatus').textContent='No match — spin again!'; } $('slotScore').textContent='Credits: '+slotCredits; }
+/* --- 47 8-Ball --- */
+const BALL_ANS=['Yes, definitely!','It is certain.','Without a doubt!','Yes!','Most likely.','Ask again later.','Cannot predict now.','Don\'t count on it.','Very doubtful.','No way!','Outlook not so good.','Signs point to yes!'];
+function shakeBall(){ $('ballAns').textContent='🎱 ...'; setTimeout(function(){ $('ballAns').textContent=BALL_ANS[Math.floor(Math.random()*BALL_ANS.length)]; },500); }
+/* --- 48 Checkers --- */
+let chkGrid, chkTurn, chkSel=null;
+function initCheckers(){ chkGrid=Array.from({length:8},function(){return Array(8).fill('');}); for(let r=0;r<3;r++) for(let c=0;c<8;c++) if((r+c)%2===1) chkGrid[r][c]='⚫'; for(let r=5;r<8;r++) for(let c=0;c<8;c++) if((r+c)%2===1) chkGrid[r][c]='🔴'; chkTurn='🔴'; chkSel=null; $('chkStatus').textContent="Red's turn — tap a red piece, then a square."; renderChk(); }
+function renderChk(){ const b=$('chkBoard'); b.innerHTML=''; chkGrid.forEach(function(row,r){ row.forEach(function(v,c){ const d=document.createElement('div'); d.className='tile'; d.style.background=(r+c)%2?'#78350f':'#fef3c7'; d.style.borderRadius='4px'; d.textContent=v; if(chkSel&&chkSel[0]===r&&chkSel[1]===c) d.classList.add('sel'); d.onclick=function(){ chkClick(r,c); }; b.appendChild(d); }); }); }
+function chkClick(r,c){ const v=chkGrid[r][c]; if(chkSel){ const sr=chkSel[0], sc=chkSel[1]; const dr=r-sr, dc=c-sc; const dir=chkTurn==='🔴'?-1:1; if(!v && Math.abs(dc)===1 && dr===dir){ chkGrid[r][c]=chkTurn; chkGrid[sr][sc]=''; chkSel=null; chkNext(); } else if(!v && Math.abs(dc)===2 && dr===dir*2 && chkGrid[sr+dir][sc+dc/2] && chkGrid[sr+dir][sc+dc/2]!==chkTurn){ chkGrid[r][c]=chkTurn; chkGrid[sr][sc]=''; chkGrid[sr+dir][sc+dc/2]=''; chkSel=null; chkNext(); } else if(v===chkTurn){ chkSel=[r,c]; } else { chkSel=null; } renderChk(); return; } if(v===chkTurn){ chkSel=[r,c]; renderChk(); } }
+function chkNext(){ const reds=chkGrid.flat().filter(function(v){return v==='🔴';}).length, blacks=chkGrid.flat().filter(function(v){return v==='⚫';}).length; if(!reds){ $('chkStatus').textContent='Black wins! 🎉'; return; } if(!blacks){ $('chkStatus').textContent='Red wins! 🎉'; return; } chkTurn=chkTurn==='🔴'?'⚫':'🔴'; $('chkStatus').textContent=chkTurn==='🔴'?"Red's turn":"Black's turn"; if(chkTurn==='⚫') setTimeout(chkAI,500); }
+function chkAI(){ const moves=[]; chkGrid.forEach(function(row,r){ row.forEach(function(v,c){ if(v!=='⚫') return; [[1,-1],[1,1]].forEach(function(d){ const nr=r+d[0], nc=c+d[1]; if(nr<8&&nc>=0&&nc<8&&!chkGrid[nr][nc]) moves.push([r,c,nr,nc,false]); const jr=r+2*d[0], jc=c+2*d[1]; if(jr<8&&jc>=0&&jc<8&&!chkGrid[jr][jc]&&chkGrid[nr][nc]==='🔴') moves.push([r,c,jr,jc,true]); }); }); }); if(!moves.length){ $('chkStatus').textContent='Red wins! 🎉'; return; } const m=moves[Math.floor(Math.random()*moves.length)]; if(m[4]) chkGrid[m[0]+1][m[1]+(m[3]-m[1])/2]=''; chkGrid[m[2]][m[3]]='⚫'; chkGrid[m[0]][m[1]]=''; renderChk(); chkNext(); }
+/* --- 49 Lights Out --- */
+let lightGrid, lightMoves=0;
+function initLights(){ lightMoves=0; lightGrid=Array.from({length:5},function(){return Array(5).fill(false);}); for(let i=0;i<8;i++){ const r=Math.floor(Math.random()*5), c=Math.floor(Math.random()*5); lightFlip(r,c,true); } $('lightScore').textContent='Moves: 0'; $('lightStatus').textContent='Tap a light — it and its neighbours flip. Turn them all off!'; renderLights(); }
+function lightFlip(r,c,silent){ [[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){ const rr=r+d[0], cc=c+d[1]; if(rr>=0&&rr<5&&cc>=0&&cc<5) lightGrid[rr][cc]=!lightGrid[rr][cc]; }); if(!silent){ lightMoves++; $('lightScore').textContent='Moves: '+lightMoves; renderLights(); if(lightGrid.flat().every(function(v){return !v;})) $('lightStatus').textContent='All lights out! You did it in '+lightMoves+' moves! 🎉'; } }
+function renderLights(){ const b=$('lightBoard'); b.innerHTML=''; lightGrid.forEach(function(row,r){ row.forEach(function(v,c){ const d=document.createElement('div'); d.className='tile'+(v?' on':''); d.textContent=v?'💡':''; d.onclick=function(){ lightFlip(r,c); }; b.appendChild(d); }); }); }
+/* --- 50 Aim Trainer --- */
+let aimTimer=null, aimHits=0, aimTime=30, aimSpawn=null;
+function startAim(){ aimHits=0; aimTime=30; $('aimScore').textContent='Hits: 0 • Time: 30s'; $('aimArea').innerHTML=''; clearInterval(aimTimer); clearInterval(aimSpawn); aimSpawn=setInterval(function(){ if(aimTime<=0) return; const t=document.createElement('div'); t.textContent='🎯'; t.style.cssText='position:absolute;font-size:2.5rem;cursor:pointer;left:'+(Math.random()*85)+'%;top:'+(Math.random()*75)+'%;'; t.onclick=function(){ aimHits++; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; t.remove(); }; $('aimArea').appendChild(t); setTimeout(function(){ if(t.parentNode) t.remove(); },1000); },800); aimTimer=regTimer(setInterval(function(){ aimTime--; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; if(aimTime<=0){ clearInterval(aimTimer); clearInterval(aimSpawn); $('aimArea').innerHTML='<div class="big">Time up! You hit '+aimHits+' targets! 🎉</div>'; } },1000)); }
+initHang(); initWordle(); initC4(); initSudoku(); init2048(); initGuess(); initHL(); newScramble(); initMaze(); initCheckers(); initLights(); buildWhack();
 </script>
 </body>
 </html>
