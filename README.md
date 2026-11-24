@@ -1,2 +1,2 @@
-# idk
+Cool games
 Idk
