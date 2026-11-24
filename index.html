@@ -65,6 +65,46 @@
   .sudoku { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; max-width: 360px; margin: 12px auto; }
   .sudoku input { width: 100%; margin: 0; padding: 0; height: 36px; font-size: 1rem; border-radius: 4px; text-align: center; }
   .sudoku input.fixed { background: #374151; color: #fbbf24; font-weight: bold; }
+
+  /* --- Upgrade: polished look --- */
+  body { background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 45%, #111827 100%); background-attachment: fixed; }
+  .wrap { max-width: 640px; }
+  h1 { font-size: 2.4rem; background: linear-gradient(90deg, #fbbf24, #f472b6, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .menu { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .card { background: linear-gradient(145deg, rgba(31,41,55,.92), rgba(17,24,39,.92)); box-shadow: 0 4px 14px rgba(0,0,0,.35); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; animation: fadeUp .35s ease both; }
+  .card:nth-child(3n+2) { animation-delay: .04s; } .card:nth-child(3n+3) { animation-delay: .08s; }
+  .card:hover { transform: translateY(-4px) scale(1.01); border-color: #60a5fa; box-shadow: 0 12px 26px rgba(0,0,0,.5); }
+  .card:active { transform: scale(.98); }
+  .num { top: 38px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .app { animation: fadeUp .25s ease both; }
+  button { transition: transform .12s ease, filter .12s ease; box-shadow: 0 3px 10px rgba(0,0,0,.3); }
+  button:hover { filter: brightness(1.15); }
+  button:active { transform: scale(.96); }
+  .toolbar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 4px 0 12px; }
+  .toolbar button { margin: 0; padding: 10px 16px; font-size: .95rem; }
+  #searchInput { width: 100%; max-width: 480px; margin: 0 auto 10px; display: block; border-radius: 999px; padding: 12px 18px; }
+  .chips { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 0 0 14px; }
+  .chip { background: #1f2937; border: 1px solid #4b5563; color: #f9fafb; border-radius: 999px; padding: 8px 14px; font-size: .9rem; cursor: pointer; margin: 0; min-height: 38px; box-shadow: none; }
+  .chip.active { background: linear-gradient(90deg, #2563eb, #7c3aed); border-color: transparent; font-weight: bold; }
+  .fav { position: absolute; top: 8px; right: 10px; background: transparent; border: 0; color: #fbbf24; font-size: 1.3rem; padding: 2px 6px; margin: 0; min-height: 0; box-shadow: none; cursor: pointer; }
+  .fav:hover { transform: scale(1.25); }
+  .bestline { color: #fbbf24; font-weight: 600; margin: 6px 0; font-size: 1rem; }
+  .diffrow { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin: 8px 0; font-size: .95rem; color: #9ca3af; }
+  .diffbtn { background: #374151; padding: 8px 14px; margin: 0; font-size: .9rem; min-height: 38px; }
+  .diffbtn.active { background: #f59e0b; color: #111; font-weight: bold; }
+  .foot { color: #6b7280; font-size: .85rem; margin-top: 28px; }
+  /* Light theme */
+  body.light { background: linear-gradient(160deg, #e0f2fe, #fef3c7, #ffffff); color: #111827; }
+  body.light .card { background: #ffffff; border-color: #e5e7eb; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  body.light .card p, body.light p.sub, body.light .status, body.light .diffrow { color: #4b5563; }
+  body.light .num, body.light .foot { color: #9ca3af; }
+  body.light .chip { background: #fff; border-color: #d1d5db; color: #111827; }
+  body.light .chip.active { color: #fff; }
+  body.light button.secondary, body.light .diffbtn { background: #e5e7eb; color: #111827; }
+  body.light input, body.light textarea, body.light select { background: #fff; color: #111827; border-color: #d1d5db; }
+  body.light .cell, body.light .mcard, body.light .tile, body.light .quizopt { background: #f3f4f6; border-color: #d1d5db; color: #111827; }
+  body.light .todoitem { background: #f3f4f6; color: #111827; }
 </style>
 </head>
 <body>
@@ -72,157 +112,175 @@
 <div id="menu">
 <h1>🎮 idk</h1>
 <p class="sub">150 games &amp; apps — pick one!</p>
+<div class="toolbar">
+<button id="themeBtn" class="secondary" onclick="toggleTheme()">☀️ Light mode</button>
+<button id="soundBtn" class="secondary" onclick="toggleSound()">🔊 Sound on</button>
+<button id="randomBtn" onclick="randomApp()">🎲 Random app</button>
+</div>
+<input id="searchInput" type="text" placeholder="🔍 Search 150 apps..." oninput="applyFilters()">
+<div class="chips" id="catChips">
+<button class="chip active" data-cat="all" onclick="setCat('all',this)">All</button>
+<button class="chip" data-cat="games" onclick="setCat('games',this)">🎲 Games</button>
+<button class="chip" data-cat="arcade" onclick="setCat('arcade',this)">🕹️ Arcade</button>
+<button class="chip" data-cat="puzzles" onclick="setCat('puzzles',this)">🧩 Puzzles</button>
+<button class="chip" data-cat="quizzes" onclick="setCat('quizzes',this)">🧠 Quizzes</button>
+<button class="chip" data-cat="tools" onclick="setCat('tools',this)">🛠️ Tools</button>
+<button class="chip" data-cat="fun" onclick="setCat('fun',this)">🎉 Fun</button>
+<button class="chip" data-cat="favs" onclick="setCat('favs',this)">⭐ Favorites</button>
+</div>
+<p class="sub" id="countLine">150 games &amp; apps — pick one!</p>
+<p class="sub hidden" id="noResults">No apps match — try another search.</p>
 <div class="menu">
-<div class="card" onclick="showGame('snake')"><span class="num">1</span><div class="emoji">🐍</div><h2>Snake</h2><p>Eat the food, grow longer, don't hit the wall.</p></div>
-<div class="card" onclick="showGame('ttt')"><span class="num">2</span><div class="emoji">❌⭕</div><h2>Tic-Tac-Toe</h2><p>Play against the computer or a friend.</p></div>
-<div class="card" onclick="showGame('memory')"><span class="num">3</span><div class="emoji">🃏</div><h2>Memory Match</h2><p>Flip cards and find all 8 pairs.</p></div>
-<div class="card" onclick="showGame('pong')"><span class="num">4</span><div class="emoji">🏓</div><h2>Pong</h2><p>Bounce the ball past the computer paddle.</p></div>
-<div class="card" onclick="showGame('breakout')"><span class="num">5</span><div class="emoji">🧱</div><h2>Breakout</h2><p>Smash all the bricks with the ball.</p></div>
-<div class="card" onclick="showGame('flappy')"><span class="num">6</span><div class="emoji">🐤</div><h2>Flappy Bird</h2><p>Tap to fly through the pipes.</p></div>
-<div class="card" onclick="showGame('mines')"><span class="num">7</span><div class="emoji">💣</div><h2>Minesweeper</h2><p>Clear the field without hitting a mine.</p></div>
-<div class="card" onclick="showGame('tetris')"><span class="num">8</span><div class="emoji">🟪</div><h2>Tetris Lite</h2><p>Stack falling blocks and clear lines.</p></div>
-<div class="card" onclick="showGame('simon')"><span class="num">9</span><div class="emoji">🔴</div><h2>Simon Says</h2><p>Repeat the growing colour pattern.</p></div>
-<div class="card" onclick="showGame('whack')"><span class="num">10</span><div class="emoji">🔨</div><h2>Whack-a-Mole</h2><p>Tap the moles as fast as you can.</p></div>
-<div class="card" onclick="showGame('rps')"><span class="num">11</span><div class="emoji">✂️</div><h2>Rock Paper Scissors</h2><p>Beat the computer, best of luck.</p></div>
-<div class="card" onclick="showGame('hangman')"><span class="num">12</span><div class="emoji">🎯</div><h2>Hangman</h2><p>Guess the word before you run out of lives.</p></div>
-<div class="card" onclick="showGame('wordle')"><span class="num">13</span><div class="emoji">🔤</div><h2>Wordle Lite</h2><p>Guess the 5-letter word in 6 tries.</p></div>
-<div class="card" onclick="showGame('connect4')"><span class="num">14</span><div class="emoji">🔴</div><h2>Connect Four</h2><p>Drop discs and get four in a row.</p></div>
-<div class="card" onclick="showGame('sudoku')"><span class="num">15</span><div class="emoji">🔢</div><h2>Sudoku</h2><p>Fill the grid so every row and column works.</p></div>
-<div class="card" onclick="showGame('game2048')"><span class="num">16</span><div class="emoji">2️⃣</div><h2>2048</h2><p>Slide tiles and merge to 2048.</p></div>
-<div class="card" onclick="showGame('dice')"><span class="num">17</span><div class="emoji">🎲</div><h2>Dice Roller</h2><p>Roll one or two dice.</p></div>
-<div class="card" onclick="showGame('coin')"><span class="num">18</span><div class="emoji">🪙</div><h2>Coin Flip</h2><p>Heads or tails? Flip and see.</p></div>
-<div class="card" onclick="showGame('calc')"><span class="num">19</span><div class="emoji">🧮</div><h2>Calculator</h2><p>A simple working calculator.</p></div>
-<div class="card" onclick="showGame('stopwatch')"><span class="num">20</span><div class="emoji">⏱️</div><h2>Stopwatch</h2><p>Time yourself, start and stop.</p></div>
-<div class="card" onclick="showGame('countdown')"><span class="num">21</span><div class="emoji">⏲️</div><h2>Countdown Timer</h2><p>Set minutes and count down.</p></div>
-<div class="card" onclick="showGame('draw')"><span class="num">22</span><div class="emoji">🎨</div><h2>Drawing Pad</h2><p>Draw with your finger or mouse.</p></div>
-<div class="card" onclick="showGame('color')"><span class="num">23</span><div class="emoji">🌈</div><h2>Color Picker</h2><p>Pick a colour and see its code.</p></div>
-<div class="card" onclick="showGame('notes')"><span class="num">24</span><div class="emoji">📝</div><h2>Notes</h2><p>Write a note, it saves on this device.</p></div>
-<div class="card" onclick="showGame('todo')"><span class="num">25</span><div class="emoji">✅</div><h2>Todo List</h2><p>Add tasks and tick them off.</p></div>
-<div class="card" onclick="showGame('quote')"><span class="num">26</span><div class="emoji">💬</div><h2>Random Quote</h2><p>Get a new inspiring quote.</p></div>
-<div class="card" onclick="showGame('joke')"><span class="num">27</span><div class="emoji">😂</div><h2>Joke Generator</h2><p>Get a random joke.</p></div>
-<div class="card" onclick="showGame('password')"><span class="num">28</span><div class="emoji">🔐</div><h2>Password Generator</h2><p>Make a strong random password.</p></div>
-<div class="card" onclick="showGame('converter')"><span class="num">29</span><div class="emoji">📏</div><h2>Unit Converter</h2><p>Convert length, weight and temperature.</p></div>
-<div class="card" onclick="showGame('bmi')"><span class="num">30</span><div class="emoji">⚖️</div><h2>BMI Calculator</h2><p>Work out your body mass index.</p></div>
-<div class="card" onclick="showGame('tip')"><span class="num">31</span><div class="emoji">💰</div><h2>Tip Calculator</h2><p>Split a bill and work out the tip.</p></div>
-<div class="card" onclick="showGame('pomodoro')"><span class="num">32</span><div class="emoji">🍅</div><h2>Pomodoro Timer</h2><p>25 minutes focus, 5 minutes break.</p></div>
-<div class="card" onclick="showGame('reaction')"><span class="num">33</span><div class="emoji">⚡</div><h2>Reaction Time Test</h2><p>Tap as soon as it turns green.</p></div>
-<div class="card" onclick="showGame('typing')"><span class="num">34</span><div class="emoji">⌨️</div><h2>Typing Test</h2><p>Type the sentence and check your speed.</p></div>
-<div class="card" onclick="showGame('clickspeed')"><span class="num">35</span><div class="emoji">🖱️</div><h2>Click Speed Test</h2><p>How many clicks in 10 seconds?</p></div>
-<div class="card" onclick="showGame('guessing')"><span class="num">36</span><div class="emoji">🔮</div><h2>Number Guessing</h2><p>Guess the number from 1 to 100.</p></div>
-<div class="card" onclick="showGame('higherlower')"><span class="num">37</span><div class="emoji">⬆️</div><h2>Higher or Lower</h2><p>Guess if the next card is higher.</p></div>
-<div class="card" onclick="showGame('trivia')"><span class="num">38</span><div class="emoji">🧠</div><h2>Trivia Quiz</h2><p>Answer 5 general knowledge questions.</p></div>
-<div class="card" onclick="showGame('mathquiz')"><span class="num">39</span><div class="emoji">➗</div><h2>Math Quiz</h2><p>10 quick maths questions.</p></div>
-<div class="card" onclick="showGame('scramble')"><span class="num">40</span><div class="emoji">🔀</div><h2>Word Scramble</h2><p>Unscramble the word.</p></div>
-<div class="card" onclick="showGame('bubble')"><span class="num">41</span><div class="emoji">🫧</div><h2>Bubble Pop</h2><p>Pop as many bubbles as you can.</p></div>
-<div class="card" onclick="showGame('catch')"><span class="num">42</span><div class="emoji">🧺</div><h2>Catch the Falling Objects</h2><p>Move the basket and catch the falling fruit.</p></div>
-<div class="card" onclick="showGame('maze')"><span class="num">43</span><div class="emoji">🌀</div><h2>Maze</h2><p>Find your way to the exit.</p></div>
-<div class="card" onclick="showGame('piano')"><span class="num">44</span><div class="emoji">🎹</div><h2>Piano Keyboard</h2><p>Play notes on a piano.</p></div>
-<div class="card" onclick="showGame('drum')"><span class="num">45</span><div class="emoji">🥁</div><h2>Drum Pad</h2><p>Tap the pads to make beats.</p></div>
-<div class="card" onclick="showGame('slots')"><span class="num">46</span><div class="emoji">🎰</div><h2>Slot Machine</h2><p>Spin the reels and match three.</p></div>
-<div class="card" onclick="showGame('eightball')"><span class="num">47</span><div class="emoji">🎱</div><h2>Magic 8-Ball</h2><p>Ask a question, shake for an answer.</p></div>
-<div class="card" onclick="showGame('checkers')"><span class="num">48</span><div class="emoji">♟️</div><h2>Checkers</h2><p>Jump your opponent's pieces.</p></div>
-<div class="card" onclick="showGame('lights')"><span class="num">49</span><div class="emoji">💡</div><h2>Lights Out</h2><p>Tap lights to turn them all off.</p></div>
-<div class="card" onclick="showGame('aim')"><span class="num">50</span><div class="emoji">🎯</div><h2>Aim Trainer</h2><p>Tap the targets as fast as you can.</p></div>
-<div class="card" onclick="showGame('x51')"><span class="num">51</span><div class="emoji">🐍</div><h2>Snake Speed</h2><p>Faster snake — eat fast, don't crash!</p></div>
-<div class="card" onclick="showGame('x52')"><span class="num">52</span><div class="emoji">🧱</div><h2>Snake vs Walls</h2><p>Snake with walls in the way — don't hit them!</p></div>
-<div class="card" onclick="showGame('x53')"><span class="num">53</span><div class="emoji">🏓</div><h2>Pong 2 Player</h2><p>Left player: W/S. Right player: ↑/↓. First to 5!</p></div>
-<div class="card" onclick="showGame('x54')"><span class="num">54</span><div class="emoji">🧱</div><h2>Breakout 2</h2><p>More bricks, faster ball. Move with mouse or arrows.</p></div>
-<div class="card" onclick="showGame('x55')"><span class="num">55</span><div class="emoji">☄️</div><h2>Asteroids Lite</h2><p>← → rotate, ↑ thrust, Space to shoot the rocks.</p></div>
-<div class="card" onclick="showGame('x56')"><span class="num">56</span><div class="emoji">👾</div><h2>Space Invaders Lite</h2><p>← → move, Space to shoot. Don't let them land!</p></div>
-<div class="card" onclick="showGame('x57')"><span class="num">57</span><div class="emoji">🟡</div><h2>Pac-Man Lite</h2><p>Eat all the dots, dodge the ghost. Arrow keys!</p></div>
-<div class="card" onclick="showGame('x58')"><span class="num">58</span><div class="emoji">🐸</div><h2>Frogger Lite</h2><p>Hop up through the traffic to reach the top!</p></div>
-<div class="card" onclick="showGame('x59')"><span class="num">59</span><div class="emoji">🏃</div><h2>Runner</h2><p>Tap or press Space to jump over the obstacles!</p></div>
-<div class="card" onclick="showGame('x60')"><span class="num">60</span><div class="emoji">🦘</div><h2>Doodle Jump Lite</h2><p>Bounce up the platforms — don't fall!</p></div>
-<div class="card" onclick="showGame('x61')"><span class="num">61</span><div class="emoji">🐔</div><h2>Crossy Road Lite</h2><p>Hop across the road — dodge the cars!</p></div>
-<div class="card" onclick="showGame('x62')"><span class="num">62</span><div class="emoji">🍉</div><h2>Fruit Ninja Lite</h2><p>Click the fruit to slice it. Don't hit the bombs!</p></div>
-<div class="card" onclick="showGame('x63')"><span class="num">63</span><div class="emoji">🍬</div><h2>Candy Crush Lite</h2><p>Swap candies to match 3 in a row!</p></div>
-<div class="card" onclick="showGame('x64')"><span class="num">64</span><div class="emoji">💎</div><h2>Match-3</h2><p>Swap gems to match 3 or more!</p></div>
-<div class="card" onclick="showGame('x65')"><span class="num">65</span><div class="emoji">🔷</div><h2>Bejeweled Lite</h2><p>Big 8x8 board — match gems and rack up points!</p></div>
-<div class="card" onclick="showGame('x66')"><span class="num">66</span><div class="emoji">🫧</div><h2>Bubble Shooter</h2><p>Aim and shoot bubbles to pop matching groups!</p></div>
-<div class="card" onclick="showGame('x67')"><span class="num">67</span><div class="emoji">🪃</div><h2>Slingshot</h2><p>Drag back and release to knock down the targets!</p></div>
-<div class="card" onclick="showGame('x68')"><span class="num">68</span><div class="emoji">⛳</div><h2>Golf Putt</h2><p>Time the power meter and sink the putt!</p></div>
-<div class="card" onclick="showGame('x69')"><span class="num">69</span><div class="emoji">🏀</div><h2>Basketball Shoot</h2><p>Pick your power and shoot the hoop!</p></div>
-<div class="card" onclick="showGame('x70')"><span class="num">70</span><div class="emoji">⚽</div><h2>Soccer Penalty</h2><p>Pick a corner and shoot past the goalie!</p></div>
-<div class="card" onclick="showGame('x71')"><span class="num">71</span><div class="emoji">🎳</div><h2>Bowling</h2><p>Aim, set power, and knock down the pins!</p></div>
-<div class="card" onclick="showGame('x72')"><span class="num">72</span><div class="emoji">🎯</div><h2>Darts</h2><p>Tap the moving dartboard to score!</p></div>
-<div class="card" onclick="showGame('x73')"><span class="num">73</span><div class="emoji">🏹</div><h2>Archery</h2><p>Aim with the wind and hit the target!</p></div>
-<div class="card" onclick="showGame('x74')"><span class="num">74</span><div class="emoji">🎣</div><h2>Fishing</h2><p>Cast your line, wait for a bite, then reel it in!</p></div>
-<div class="card" onclick="showGame('x75')"><span class="num">75</span><div class="emoji">🍳</div><h2>Cooking Timer</h2><p>Preset timers for eggs, pasta and rice.</p></div>
-<div class="card" onclick="showGame('x76')"><span class="num">76</span><div class="emoji">🍲</div><h2>Recipe Randomizer</h2><p>Can't decide dinner? Get a random recipe!</p></div>
-<div class="card" onclick="showGame('x77')"><span class="num">77</span><div class="emoji">🌦️</div><h2>Weather Simulator</h2><p>Get a random weather forecast!</p></div>
-<div class="card" onclick="showGame('x78')"><span class="num">78</span><div class="emoji">🔮</div><h2>Fortune Teller</h2><p>Ask the crystal ball your future!</p></div>
-<div class="card" onclick="showGame('x79')"><span class="num">79</span><div class="emoji">💕</div><h2>Love Calculator</h2><p>Type two names and see the love %!</p></div>
-<div class="card" onclick="showGame('x80')"><span class="num">80</span><div class="emoji">🧑</div><h2>Name Generator</h2><p>Generate a random fun name!</p></div>
-<div class="card" onclick="showGame('x81')"><span class="num">81</span><div class="emoji">📖</div><h2>Story Generator</h2><p>Get a random story starter!</p></div>
-<div class="card" onclick="showGame('x82')"><span class="num">82</span><div class="emoji">📝</div><h2>Mad Libs</h2><p>Fill in the blanks for a silly story!</p></div>
-<div class="card" onclick="showGame('x83')"><span class="num">83</span><div class="emoji">❓</div><h2>Riddle Quiz</h2><p>Solve 5 tricky riddles!</p></div>
-<div class="card" onclick="showGame('x84')"><span class="num">84</span><div class="emoji">🧩</div><h2>Brain Teaser</h2><p>5 teasers to bend your brain!</p></div>
-<div class="card" onclick="showGame('x85')"><span class="num">85</span><div class="emoji">👁️</div><h2>Optical Illusion</h2><p>Your eyes will trick you — tap to reveal!</p></div>
-<div class="card" onclick="showGame('x86')"><span class="num">86</span><div class="emoji">🎨</div><h2>Color Blind Test</h2><p>What number do you see? 5 rounds!</p></div>
-<div class="card" onclick="showGame('x87')"><span class="num">87</span><div class="emoji">🔊</div><h2>Hearing Test</h2><p>Can you hear these tones? Turn your volume up!</p></div>
-<div class="card" onclick="showGame('x88')"><span class="num">88</span><div class="emoji">🔢</div><h2>Memory Sequence</h2><p>Watch the numbers, then tap them back in order!</p></div>
-<div class="card" onclick="showGame('x89')"><span class="num">89</span><div class="emoji">🔍</div><h2>Pattern Match</h2><p>Which one matches the pattern?</p></div>
-<div class="card" onclick="showGame('x90')"><span class="num">90</span><div class="emoji">👀</div><h2>Spot the Difference</h2><p>Find the 3 things that are different!</p></div>
-<div class="card" onclick="showGame('x91')"><span class="num">91</span><div class="emoji">🔎</div><h2>Hidden Object</h2><p>Find the one different emoji!</p></div>
-<div class="card" onclick="showGame('x92')"><span class="num">92</span><div class="emoji">🧩</div><h2>Jigsaw Lite</h2><p>Slide the tiles to put them in order 1-8!</p></div>
-<div class="card" onclick="showGame('x93')"><span class="num">93</span><div class="emoji">🎴</div><h2>Dominoes</h2><p>Draw dominoes and match the ends!</p></div>
-<div class="card" onclick="showGame('x94')"><span class="num">94</span><div class="emoji">⚔️</div><h2>Card War</h2><p>High card wins the round!</p></div>
-<div class="card" onclick="showGame('x95')"><span class="num">95</span><div class="emoji">♠️</div><h2>Blackjack Lite</h2><p>Get to 21 without going over!</p></div>
-<div class="card" onclick="showGame('x96')"><span class="num">96</span><div class="emoji">🎲</div><h2>Poker Dice</h2><p>Roll 5 dice and make the best hand!</p></div>
-<div class="card" onclick="showGame('x97')"><span class="num">97</span><div class="emoji">🎡</div><h2>Roulette</h2><p>Bet on red or black and spin the wheel!</p></div>
-<div class="card" onclick="showGame('x98')"><span class="num">98</span><div class="emoji">🎫</div><h2>Bingo</h2><p>Mark your card as numbers are called!</p></div>
-<div class="card" onclick="showGame('x99')"><span class="num">99</span><div class="emoji">🎟️</div><h2>Lottery Picker</h2><p>Your 6 lucky lottery numbers!</p></div>
-<div class="card" onclick="showGame('x100')"><span class="num">100</span><div class="emoji">🖖</div><h2>RPS Lizard Spock</h2><p>Rock, Paper, Scissors, Lizard, Spock!</p></div>
-<div class="card" onclick="showGame('x101')"><span class="num">101</span><div class="emoji">❌</div><h2>Tic-Tac-Toe Hard</h2><p>A smarter computer that blocks and wins!</p></div>
-<div class="card" onclick="showGame('x102')"><span class="num">102</span><div class="emoji">🔴</div><h2>Connect Four 2P</h2><p>Two players, pass and play!</p></div>
-<div class="card" onclick="showGame('x103')"><span class="num">103</span><div class="emoji">♞</div><h2>Chess Puzzles</h2><p>Solve these mate-in-one puzzles!</p></div>
-<div class="card" onclick="showGame('x104')"><span class="num">104</span><div class="emoji">🔤</div><h2>Word Search</h2><p>Find the hidden words in the grid!</p></div>
-<div class="card" onclick="showGame('x105')"><span class="num">105</span><div class="emoji">✏️</div><h2>Crossword Lite</h2><p>Fill the 3x3 word square: CAT / ATE / TEA!</p></div>
-<div class="card" onclick="showGame('x106')"><span class="num">106</span><div class="emoji">🔡</div><h2>Anagram Solver</h2><p>Unscramble the letters to find the word!</p></div>
-<div class="card" onclick="showGame('x107')"><span class="num">107</span><div class="emoji">🐝</div><h2>Spelling Bee</h2><p>Spell the word you see — no peeking at the letters!</p></div>
-<div class="card" onclick="showGame('x108')"><span class="num">108</span><div class="emoji">🏁</div><h2>Typing Race</h2><p>Type the sentence as fast as you can!</p></div>
-<div class="card" onclick="showGame('x109')"><span class="num">109</span><div class="emoji">📻</div><h2>Morse Code</h2><p>Translate text to Morse, or guess the letter!</p></div>
-<div class="card" onclick="showGame('x110')"><span class="num">110</span><div class="emoji">💻</div><h2>Binary Converter</h2><p>Decimal to binary and back!</p></div>
-<div class="card" onclick="showGame('x111')"><span class="num">111</span><div class="emoji">🖌️</div><h2>Hex Color Game</h2><p>Guess which hex code matches the colour!</p></div>
-<div class="card" onclick="showGame('x112')"><span class="num">112</span><div class="emoji">🔢</div><h2>Prime Checker</h2><p>Is your number prime?</p></div>
-<div class="card" onclick="showGame('x113')"><span class="num">113</span><div class="emoji">🌀</div><h2>Fibonacci</h2><p>Generate the Fibonacci sequence!</p></div>
-<div class="card" onclick="showGame('x114')"><span class="num">114</span><div class="emoji">🥧</div><h2>Pi Memory</h2><p>How many digits of pi can you remember?</p></div>
-<div class="card" onclick="showGame('x115')"><span class="num">115</span><div class="emoji">🌍</div><h2>World Clock</h2><p>What time is it around the world?</p></div>
-<div class="card" onclick="showGame('x116')"><span class="num">116</span><div class="emoji">📅</div><h2>Calendar</h2><p>This month at a glance!</p></div>
-<div class="card" onclick="showGame('x117')"><span class="num">117</span><div class="emoji">🎂</div><h2>Age Calculator</h2><p>How old are you, exactly?</p></div>
-<div class="card" onclick="showGame('x118')"><span class="num">118</span><div class="emoji">⏳</div><h2>Date Countdown</h2><p>Count down the days to a big date!</p></div>
-<div class="card" onclick="showGame('x119')"><span class="num">119</span><div class="emoji">📋</div><h2>Habit Tracker</h2><p>Tick off today's habits!</p></div>
-<div class="card" onclick="showGame('x120')"><span class="num">120</span><div class="emoji">💧</div><h2>Water Tracker</h2><p>How many glasses of water today?</p></div>
-<div class="card" onclick="showGame('x121')"><span class="num">121</span><div class="emoji">👟</div><h2>Steps Counter Sim</h2><p>Tap to walk — can you reach 10,000 steps?</p></div>
-<div class="card" onclick="showGame('x122')"><span class="num">122</span><div class="emoji">😴</div><h2>Sleep Calculator</h2><p>What time should you wake up or go to bed?</p></div>
-<div class="card" onclick="showGame('x123')"><span class="num">123</span><div class="emoji">💪</div><h2>Workout Randomizer</h2><p>Get a random quick workout!</p></div>
-<div class="card" onclick="showGame('x124')"><span class="num">124</span><div class="emoji">🧘</div><h2>Yoga Pose</h2><p>Get a random yoga pose to try!</p></div>
-<div class="card" onclick="showGame('x125')"><span class="num">125</span><div class="emoji">🕯️</div><h2>Meditation Timer</h2><p>A calm countdown to clear your mind.</p></div>
-<div class="card" onclick="showGame('x126')"><span class="num">126</span><div class="emoji">🌬️</div><h2>Breathing Exercise</h2><p>Breathe in for 4, hold, breathe out for 4.</p></div>
-<div class="card" onclick="showGame('x127')"><span class="num">127</span><div class="emoji">😊</div><h2>Mood Tracker</h2><p>How are you feeling today?</p></div>
-<div class="card" onclick="showGame('x128')"><span class="num">128</span><div class="emoji">✍️</div><h2>Journal</h2><p>Write today's journal entry!</p></div>
-<div class="card" onclick="showGame('x129')"><span class="num">129</span><div class="emoji">💸</div><h2>Budget Tracker</h2><p>Track money in and out!</p></div>
-<div class="card" onclick="showGame('x130')"><span class="num">130</span><div class="emoji">💰</div><h2>Savings Goal</h2><p>How long until you can afford it?</p></div>
-<div class="card" onclick="showGame('x131')"><span class="num">131</span><div class="emoji">💱</div><h2>Currency Converter</h2><p>Convert between USD, EUR, GBP and JPY!</p></div>
-<div class="card" onclick="showGame('x132')"><span class="num">132</span><div class="emoji">📏</div><h2>Length Converter</h2><p>Metres, feet, cm, inches and miles!</p></div>
-<div class="card" onclick="showGame('x133')"><span class="num">133</span><div class="emoji">⚖️</div><h2>Weight Converter</h2><p>Kg, pounds and ounces!</p></div>
-<div class="card" onclick="showGame('x134')"><span class="num">134</span><div class="emoji">🌡️</div><h2>Temperature Converter</h2><p>Celsius, Fahrenheit and Kelvin!</p></div>
-<div class="card" onclick="showGame('x135')"><span class="num">135</span><div class="emoji">🚗</div><h2>Speed Converter</h2><p>Km/h, mph and m/s!</p></div>
-<div class="card" onclick="showGame('x136')"><span class="num">136</span><div class="emoji">📐</div><h2>Area Calculator</h2><p>Area of rectangles and circles!</p></div>
-<div class="card" onclick="showGame('x137')"><span class="num">137</span><div class="emoji">🧊</div><h2>Volume Calculator</h2><p>Volume of boxes and spheres!</p></div>
-<div class="card" onclick="showGame('x138')"><span class="num">138</span><div class="emoji">🏦</div><h2>Loan Calculator</h2><p>Monthly payment on a loan!</p></div>
-<div class="card" onclick="showGame('x139')"><span class="num">139</span><div class="emoji">🏠</div><h2>Mortgage Calculator</h2><p>Monthly payment on a house!</p></div>
-<div class="card" onclick="showGame('x140')"><span class="num">140</span><div class="emoji">🎓</div><h2>Grade Calculator</h2><p>What grade did you get on the test?</p></div>
-<div class="card" onclick="showGame('x141')"><span class="num">141</span><div class="emoji">📊</div><h2>GPA Calculator</h2><p>Work out your GPA from 4 grades!</p></div>
-<div class="card" onclick="showGame('x142')"><span class="num">142</span><div class="emoji">🎲</div><h2>Yahtzee Lite</h2><p>Roll 5 dice, pick a scoring category!</p></div>
-<div class="card" onclick="showGame('x143')"><span class="num">143</span><div class="emoji">🀄</div><h2>Domino Train</h2><p>Build a train of dominoes — match the ends!</p></div>
-<div class="card" onclick="showGame('x144')"><span class="num">144</span><div class="emoji">🃏</div><h2>Solitaire Lite</h2><p>Build the 4 foundations from Ace to King!</p></div>
-<div class="card" onclick="showGame('x145')"><span class="num">145</span><div class="emoji">🎴</div><h2>Uno Lite</h2><p>Match the colour or number to play your cards!</p></div>
-<div class="card" onclick="showGame('x146')"><span class="num">146</span><div class="emoji">🐟</div><h2>Go Fish</h2><p>Ask the computer for a rank — make sets of 4!</p></div>
-<div class="card" onclick="showGame('x147')"><span class="num">147</span><div class="emoji">⚔️</div><h2>War Card Game</h2><p>Flip cards — high card takes the pile!</p></div>
-<div class="card" onclick="showGame('x148')"><span class="num">148</span><div class="emoji">👏</div><h2>Snap</h2><p>Tap SNAP when the two cards match!</p></div>
-<div class="card" onclick="showGame('x149')"><span class="num">149</span><div class="emoji">🧠</div><h2>Trivia Hard</h2><p>5 really hard questions!</p></div>
-<div class="card" onclick="showGame('x150')"><span class="num">150</span><div class="emoji">👑</div><h2>Final Boss Quiz</h2><p>10 mixed hard questions — can you beat the boss?</p></div>
+<div class="card" data-id="snake" data-category="arcade" onclick="showGame('snake')"><span class="num">1</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('snake',this)">☆</button><div class="emoji">🐍</div><h2>Snake</h2><p>Eat the food, grow longer, don't hit the wall.</p></div>
+<div class="card" data-id="ttt" data-category="games" onclick="showGame('ttt')"><span class="num">2</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('ttt',this)">☆</button><div class="emoji">❌⭕</div><h2>Tic-Tac-Toe</h2><p>Play against the computer or a friend.</p></div>
+<div class="card" data-id="memory" data-category="puzzles" onclick="showGame('memory')"><span class="num">3</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('memory',this)">☆</button><div class="emoji">🃏</div><h2>Memory Match</h2><p>Flip cards and find all 8 pairs.</p></div>
+<div class="card" data-id="pong" data-category="arcade" onclick="showGame('pong')"><span class="num">4</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('pong',this)">☆</button><div class="emoji">🏓</div><h2>Pong</h2><p>Bounce the ball past the computer paddle.</p></div>
+<div class="card" data-id="breakout" data-category="arcade" onclick="showGame('breakout')"><span class="num">5</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('breakout',this)">☆</button><div class="emoji">🧱</div><h2>Breakout</h2><p>Smash all the bricks with the ball.</p></div>
+<div class="card" data-id="flappy" data-category="arcade" onclick="showGame('flappy')"><span class="num">6</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('flappy',this)">☆</button><div class="emoji">🐤</div><h2>Flappy Bird</h2><p>Tap to fly through the pipes.</p></div>
+<div class="card" data-id="mines" data-category="puzzles" onclick="showGame('mines')"><span class="num">7</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('mines',this)">☆</button><div class="emoji">💣</div><h2>Minesweeper</h2><p>Clear the field without hitting a mine.</p></div>
+<div class="card" data-id="tetris" data-category="puzzles" onclick="showGame('tetris')"><span class="num">8</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('tetris',this)">☆</button><div class="emoji">🟪</div><h2>Tetris Lite</h2><p>Stack falling blocks and clear lines.</p></div>
+<div class="card" data-id="simon" data-category="puzzles" onclick="showGame('simon')"><span class="num">9</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('simon',this)">☆</button><div class="emoji">🔴</div><h2>Simon Says</h2><p>Repeat the growing colour pattern.</p></div>
+<div class="card" data-id="whack" data-category="arcade" onclick="showGame('whack')"><span class="num">10</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('whack',this)">☆</button><div class="emoji">🔨</div><h2>Whack-a-Mole</h2><p>Tap the moles as fast as you can.</p></div>
+<div class="card" data-id="rps" data-category="games" onclick="showGame('rps')"><span class="num">11</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('rps',this)">☆</button><div class="emoji">✂️</div><h2>Rock Paper Scissors</h2><p>Beat the computer, best of luck.</p></div>
+<div class="card" data-id="hangman" data-category="puzzles" onclick="showGame('hangman')"><span class="num">12</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('hangman',this)">☆</button><div class="emoji">🎯</div><h2>Hangman</h2><p>Guess the word before you run out of lives.</p></div>
+<div class="card" data-id="wordle" data-category="puzzles" onclick="showGame('wordle')"><span class="num">13</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('wordle',this)">☆</button><div class="emoji">🔤</div><h2>Wordle Lite</h2><p>Guess the 5-letter word in 6 tries.</p></div>
+<div class="card" data-id="connect4" data-category="games" onclick="showGame('connect4')"><span class="num">14</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('connect4',this)">☆</button><div class="emoji">🔴</div><h2>Connect Four</h2><p>Drop discs and get four in a row.</p></div>
+<div class="card" data-id="sudoku" data-category="puzzles" onclick="showGame('sudoku')"><span class="num">15</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('sudoku',this)">☆</button><div class="emoji">🔢</div><h2>Sudoku</h2><p>Fill the grid so every row and column works.</p></div>
+<div class="card" data-id="game2048" data-category="puzzles" onclick="showGame('game2048')"><span class="num">16</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('game2048',this)">☆</button><div class="emoji">2️⃣</div><h2>2048</h2><p>Slide tiles and merge to 2048.</p></div>
+<div class="card" data-id="dice" data-category="fun" onclick="showGame('dice')"><span class="num">17</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('dice',this)">☆</button><div class="emoji">🎲</div><h2>Dice Roller</h2><p>Roll one or two dice.</p></div>
+<div class="card" data-id="coin" data-category="fun" onclick="showGame('coin')"><span class="num">18</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('coin',this)">☆</button><div class="emoji">🪙</div><h2>Coin Flip</h2><p>Heads or tails? Flip and see.</p></div>
+<div class="card" data-id="calc" data-category="tools" onclick="showGame('calc')"><span class="num">19</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('calc',this)">☆</button><div class="emoji">🧮</div><h2>Calculator</h2><p>A simple working calculator.</p></div>
+<div class="card" data-id="stopwatch" data-category="tools" onclick="showGame('stopwatch')"><span class="num">20</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('stopwatch',this)">☆</button><div class="emoji">⏱️</div><h2>Stopwatch</h2><p>Time yourself, start and stop.</p></div>
+<div class="card" data-id="countdown" data-category="tools" onclick="showGame('countdown')"><span class="num">21</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('countdown',this)">☆</button><div class="emoji">⏲️</div><h2>Countdown Timer</h2><p>Set minutes and count down.</p></div>
+<div class="card" data-id="draw" data-category="tools" onclick="showGame('draw')"><span class="num">22</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('draw',this)">☆</button><div class="emoji">🎨</div><h2>Drawing Pad</h2><p>Draw with your finger or mouse.</p></div>
+<div class="card" data-id="color" data-category="tools" onclick="showGame('color')"><span class="num">23</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('color',this)">☆</button><div class="emoji">🌈</div><h2>Color Picker</h2><p>Pick a colour and see its code.</p></div>
+<div class="card" data-id="notes" data-category="tools" onclick="showGame('notes')"><span class="num">24</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('notes',this)">☆</button><div class="emoji">📝</div><h2>Notes</h2><p>Write a note, it saves on this device.</p></div>
+<div class="card" data-id="todo" data-category="tools" onclick="showGame('todo')"><span class="num">25</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('todo',this)">☆</button><div class="emoji">✅</div><h2>Todo List</h2><p>Add tasks and tick them off.</p></div>
+<div class="card" data-id="quote" data-category="fun" onclick="showGame('quote')"><span class="num">26</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('quote',this)">☆</button><div class="emoji">💬</div><h2>Random Quote</h2><p>Get a new inspiring quote.</p></div>
+<div class="card" data-id="joke" data-category="fun" onclick="showGame('joke')"><span class="num">27</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('joke',this)">☆</button><div class="emoji">😂</div><h2>Joke Generator</h2><p>Get a random joke.</p></div>
+<div class="card" data-id="password" data-category="tools" onclick="showGame('password')"><span class="num">28</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('password',this)">☆</button><div class="emoji">🔐</div><h2>Password Generator</h2><p>Make a strong random password.</p></div>
+<div class="card" data-id="converter" data-category="tools" onclick="showGame('converter')"><span class="num">29</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('converter',this)">☆</button><div class="emoji">📏</div><h2>Unit Converter</h2><p>Convert length, weight and temperature.</p></div>
+<div class="card" data-id="bmi" data-category="tools" onclick="showGame('bmi')"><span class="num">30</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('bmi',this)">☆</button><div class="emoji">⚖️</div><h2>BMI Calculator</h2><p>Work out your body mass index.</p></div>
+<div class="card" data-id="tip" data-category="tools" onclick="showGame('tip')"><span class="num">31</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('tip',this)">☆</button><div class="emoji">💰</div><h2>Tip Calculator</h2><p>Split a bill and work out the tip.</p></div>
+<div class="card" data-id="pomodoro" data-category="tools" onclick="showGame('pomodoro')"><span class="num">32</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('pomodoro',this)">☆</button><div class="emoji">🍅</div><h2>Pomodoro Timer</h2><p>25 minutes focus, 5 minutes break.</p></div>
+<div class="card" data-id="reaction" data-category="arcade" onclick="showGame('reaction')"><span class="num">33</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('reaction',this)">☆</button><div class="emoji">⚡</div><h2>Reaction Time Test</h2><p>Tap as soon as it turns green.</p></div>
+<div class="card" data-id="typing" data-category="arcade" onclick="showGame('typing')"><span class="num">34</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('typing',this)">☆</button><div class="emoji">⌨️</div><h2>Typing Test</h2><p>Type the sentence and check your speed.</p></div>
+<div class="card" data-id="clickspeed" data-category="arcade" onclick="showGame('clickspeed')"><span class="num">35</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('clickspeed',this)">☆</button><div class="emoji">🖱️</div><h2>Click Speed Test</h2><p>How many clicks in 10 seconds?</p></div>
+<div class="card" data-id="guessing" data-category="games" onclick="showGame('guessing')"><span class="num">36</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('guessing',this)">☆</button><div class="emoji">🔮</div><h2>Number Guessing</h2><p>Guess the number from 1 to 100.</p></div>
+<div class="card" data-id="higherlower" data-category="games" onclick="showGame('higherlower')"><span class="num">37</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('higherlower',this)">☆</button><div class="emoji">⬆️</div><h2>Higher or Lower</h2><p>Guess if the next card is higher.</p></div>
+<div class="card" data-id="trivia" data-category="quizzes" onclick="showGame('trivia')"><span class="num">38</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('trivia',this)">☆</button><div class="emoji">🧠</div><h2>Trivia Quiz</h2><p>Answer 5 general knowledge questions.</p></div>
+<div class="card" data-id="mathquiz" data-category="quizzes" onclick="showGame('mathquiz')"><span class="num">39</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('mathquiz',this)">☆</button><div class="emoji">➗</div><h2>Math Quiz</h2><p>10 quick maths questions.</p></div>
+<div class="card" data-id="scramble" data-category="puzzles" onclick="showGame('scramble')"><span class="num">40</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('scramble',this)">☆</button><div class="emoji">🔀</div><h2>Word Scramble</h2><p>Unscramble the word.</p></div>
+<div class="card" data-id="bubble" data-category="arcade" onclick="showGame('bubble')"><span class="num">41</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('bubble',this)">☆</button><div class="emoji">🫧</div><h2>Bubble Pop</h2><p>Pop as many bubbles as you can.</p></div>
+<div class="card" data-id="catch" data-category="arcade" onclick="showGame('catch')"><span class="num">42</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('catch',this)">☆</button><div class="emoji">🧺</div><h2>Catch the Falling Objects</h2><p>Move the basket and catch the falling fruit.</p></div>
+<div class="card" data-id="maze" data-category="puzzles" onclick="showGame('maze')"><span class="num">43</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('maze',this)">☆</button><div class="emoji">🌀</div><h2>Maze</h2><p>Find your way to the exit.</p></div>
+<div class="card" data-id="piano" data-category="tools" onclick="showGame('piano')"><span class="num">44</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('piano',this)">☆</button><div class="emoji">🎹</div><h2>Piano Keyboard</h2><p>Play notes on a piano.</p></div>
+<div class="card" data-id="drum" data-category="fun" onclick="showGame('drum')"><span class="num">45</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('drum',this)">☆</button><div class="emoji">🥁</div><h2>Drum Pad</h2><p>Tap the pads to make beats.</p></div>
+<div class="card" data-id="slots" data-category="fun" onclick="showGame('slots')"><span class="num">46</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('slots',this)">☆</button><div class="emoji">🎰</div><h2>Slot Machine</h2><p>Spin the reels and match three.</p></div>
+<div class="card" data-id="eightball" data-category="fun" onclick="showGame('eightball')"><span class="num">47</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('eightball',this)">☆</button><div class="emoji">🎱</div><h2>Magic 8-Ball</h2><p>Ask a question, shake for an answer.</p></div>
+<div class="card" data-id="checkers" data-category="games" onclick="showGame('checkers')"><span class="num">48</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('checkers',this)">☆</button><div class="emoji">♟️</div><h2>Checkers</h2><p>Jump your opponent's pieces.</p></div>
+<div class="card" data-id="lights" data-category="puzzles" onclick="showGame('lights')"><span class="num">49</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('lights',this)">☆</button><div class="emoji">💡</div><h2>Lights Out</h2><p>Tap lights to turn them all off.</p></div>
+<div class="card" data-id="aim" data-category="arcade" onclick="showGame('aim')"><span class="num">50</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('aim',this)">☆</button><div class="emoji">🎯</div><h2>Aim Trainer</h2><p>Tap the targets as fast as you can.</p></div>
+<div class="card" data-id="x51" data-category="arcade" onclick="showGame('x51')"><span class="num">51</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x51',this)">☆</button><div class="emoji">🐍</div><h2>Snake Speed</h2><p>Faster snake — eat fast, don't crash!</p></div>
+<div class="card" data-id="x52" data-category="arcade" onclick="showGame('x52')"><span class="num">52</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x52',this)">☆</button><div class="emoji">🧱</div><h2>Snake vs Walls</h2><p>Snake with walls in the way — don't hit them!</p></div>
+<div class="card" data-id="x53" data-category="arcade" onclick="showGame('x53')"><span class="num">53</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x53',this)">☆</button><div class="emoji">🏓</div><h2>Pong 2 Player</h2><p>Left player: W/S. Right player: ↑/↓. First to 5!</p></div>
+<div class="card" data-id="x54" data-category="arcade" onclick="showGame('x54')"><span class="num">54</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x54',this)">☆</button><div class="emoji">🧱</div><h2>Breakout 2</h2><p>More bricks, faster ball. Move with mouse or arrows.</p></div>
+<div class="card" data-id="x55" data-category="arcade" onclick="showGame('x55')"><span class="num">55</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x55',this)">☆</button><div class="emoji">☄️</div><h2>Asteroids Lite</h2><p>← → rotate, ↑ thrust, Space to shoot the rocks.</p></div>
+<div class="card" data-id="x56" data-category="arcade" onclick="showGame('x56')"><span class="num">56</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x56',this)">☆</button><div class="emoji">👾</div><h2>Space Invaders Lite</h2><p>← → move, Space to shoot. Don't let them land!</p></div>
+<div class="card" data-id="x57" data-category="arcade" onclick="showGame('x57')"><span class="num">57</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x57',this)">☆</button><div class="emoji">🟡</div><h2>Pac-Man Lite</h2><p>Eat all the dots, dodge the ghost. Arrow keys!</p></div>
+<div class="card" data-id="x58" data-category="arcade" onclick="showGame('x58')"><span class="num">58</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x58',this)">☆</button><div class="emoji">🐸</div><h2>Frogger Lite</h2><p>Hop up through the traffic to reach the top!</p></div>
+<div class="card" data-id="x59" data-category="arcade" onclick="showGame('x59')"><span class="num">59</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x59',this)">☆</button><div class="emoji">🏃</div><h2>Runner</h2><p>Tap or press Space to jump over the obstacles!</p></div>
+<div class="card" data-id="x60" data-category="arcade" onclick="showGame('x60')"><span class="num">60</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x60',this)">☆</button><div class="emoji">🦘</div><h2>Doodle Jump Lite</h2><p>Bounce up the platforms — don't fall!</p></div>
+<div class="card" data-id="x61" data-category="arcade" onclick="showGame('x61')"><span class="num">61</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x61',this)">☆</button><div class="emoji">🐔</div><h2>Crossy Road Lite</h2><p>Hop across the road — dodge the cars!</p></div>
+<div class="card" data-id="x62" data-category="arcade" onclick="showGame('x62')"><span class="num">62</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x62',this)">☆</button><div class="emoji">🍉</div><h2>Fruit Ninja Lite</h2><p>Click the fruit to slice it. Don't hit the bombs!</p></div>
+<div class="card" data-id="x63" data-category="arcade" onclick="showGame('x63')"><span class="num">63</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x63',this)">☆</button><div class="emoji">🍬</div><h2>Candy Crush Lite</h2><p>Swap candies to match 3 in a row!</p></div>
+<div class="card" data-id="x64" data-category="arcade" onclick="showGame('x64')"><span class="num">64</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x64',this)">☆</button><div class="emoji">💎</div><h2>Match-3</h2><p>Swap gems to match 3 or more!</p></div>
+<div class="card" data-id="x65" data-category="arcade" onclick="showGame('x65')"><span class="num">65</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x65',this)">☆</button><div class="emoji">🔷</div><h2>Bejeweled Lite</h2><p>Big 8x8 board — match gems and rack up points!</p></div>
+<div class="card" data-id="x66" data-category="arcade" onclick="showGame('x66')"><span class="num">66</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x66',this)">☆</button><div class="emoji">🫧</div><h2>Bubble Shooter</h2><p>Aim and shoot bubbles to pop matching groups!</p></div>
+<div class="card" data-id="x67" data-category="arcade" onclick="showGame('x67')"><span class="num">67</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x67',this)">☆</button><div class="emoji">🪃</div><h2>Slingshot</h2><p>Drag back and release to knock down the targets!</p></div>
+<div class="card" data-id="x68" data-category="arcade" onclick="showGame('x68')"><span class="num">68</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x68',this)">☆</button><div class="emoji">⛳</div><h2>Golf Putt</h2><p>Time the power meter and sink the putt!</p></div>
+<div class="card" data-id="x69" data-category="arcade" onclick="showGame('x69')"><span class="num">69</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x69',this)">☆</button><div class="emoji">🏀</div><h2>Basketball Shoot</h2><p>Pick your power and shoot the hoop!</p></div>
+<div class="card" data-id="x70" data-category="arcade" onclick="showGame('x70')"><span class="num">70</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x70',this)">☆</button><div class="emoji">⚽</div><h2>Soccer Penalty</h2><p>Pick a corner and shoot past the goalie!</p></div>
+<div class="card" data-id="x71" data-category="arcade" onclick="showGame('x71')"><span class="num">71</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x71',this)">☆</button><div class="emoji">🎳</div><h2>Bowling</h2><p>Aim, set power, and knock down the pins!</p></div>
+<div class="card" data-id="x72" data-category="arcade" onclick="showGame('x72')"><span class="num">72</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x72',this)">☆</button><div class="emoji">🎯</div><h2>Darts</h2><p>Tap the moving dartboard to score!</p></div>
+<div class="card" data-id="x73" data-category="arcade" onclick="showGame('x73')"><span class="num">73</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x73',this)">☆</button><div class="emoji">🏹</div><h2>Archery</h2><p>Aim with the wind and hit the target!</p></div>
+<div class="card" data-id="x74" data-category="arcade" onclick="showGame('x74')"><span class="num">74</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x74',this)">☆</button><div class="emoji">🎣</div><h2>Fishing</h2><p>Cast your line, wait for a bite, then reel it in!</p></div>
+<div class="card" data-id="x75" data-category="tools" onclick="showGame('x75')"><span class="num">75</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x75',this)">☆</button><div class="emoji">🍳</div><h2>Cooking Timer</h2><p>Preset timers for eggs, pasta and rice.</p></div>
+<div class="card" data-id="x76" data-category="fun" onclick="showGame('x76')"><span class="num">76</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x76',this)">☆</button><div class="emoji">🍲</div><h2>Recipe Randomizer</h2><p>Can't decide dinner? Get a random recipe!</p></div>
+<div class="card" data-id="x77" data-category="fun" onclick="showGame('x77')"><span class="num">77</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x77',this)">☆</button><div class="emoji">🌦️</div><h2>Weather Simulator</h2><p>Get a random weather forecast!</p></div>
+<div class="card" data-id="x78" data-category="fun" onclick="showGame('x78')"><span class="num">78</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x78',this)">☆</button><div class="emoji">🔮</div><h2>Fortune Teller</h2><p>Ask the crystal ball your future!</p></div>
+<div class="card" data-id="x79" data-category="fun" onclick="showGame('x79')"><span class="num">79</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x79',this)">☆</button><div class="emoji">💕</div><h2>Love Calculator</h2><p>Type two names and see the love %!</p></div>
+<div class="card" data-id="x80" data-category="fun" onclick="showGame('x80')"><span class="num">80</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x80',this)">☆</button><div class="emoji">🧑</div><h2>Name Generator</h2><p>Generate a random fun name!</p></div>
+<div class="card" data-id="x81" data-category="fun" onclick="showGame('x81')"><span class="num">81</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x81',this)">☆</button><div class="emoji">📖</div><h2>Story Generator</h2><p>Get a random story starter!</p></div>
+<div class="card" data-id="x82" data-category="fun" onclick="showGame('x82')"><span class="num">82</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x82',this)">☆</button><div class="emoji">📝</div><h2>Mad Libs</h2><p>Fill in the blanks for a silly story!</p></div>
+<div class="card" data-id="x83" data-category="quizzes" onclick="showGame('x83')"><span class="num">83</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x83',this)">☆</button><div class="emoji">❓</div><h2>Riddle Quiz</h2><p>Solve 5 tricky riddles!</p></div>
+<div class="card" data-id="x84" data-category="quizzes" onclick="showGame('x84')"><span class="num">84</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x84',this)">☆</button><div class="emoji">🧩</div><h2>Brain Teaser</h2><p>5 teasers to bend your brain!</p></div>
+<div class="card" data-id="x85" data-category="fun" onclick="showGame('x85')"><span class="num">85</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x85',this)">☆</button><div class="emoji">👁️</div><h2>Optical Illusion</h2><p>Your eyes will trick you — tap to reveal!</p></div>
+<div class="card" data-id="x86" data-category="fun" onclick="showGame('x86')"><span class="num">86</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x86',this)">☆</button><div class="emoji">🎨</div><h2>Color Blind Test</h2><p>What number do you see? 5 rounds!</p></div>
+<div class="card" data-id="x87" data-category="fun" onclick="showGame('x87')"><span class="num">87</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x87',this)">☆</button><div class="emoji">🔊</div><h2>Hearing Test</h2><p>Can you hear these tones? Turn your volume up!</p></div>
+<div class="card" data-id="x88" data-category="arcade" onclick="showGame('x88')"><span class="num">88</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x88',this)">☆</button><div class="emoji">🔢</div><h2>Memory Sequence</h2><p>Watch the numbers, then tap them back in order!</p></div>
+<div class="card" data-id="x89" data-category="puzzles" onclick="showGame('x89')"><span class="num">89</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x89',this)">☆</button><div class="emoji">🔍</div><h2>Pattern Match</h2><p>Which one matches the pattern?</p></div>
+<div class="card" data-id="x90" data-category="puzzles" onclick="showGame('x90')"><span class="num">90</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x90',this)">☆</button><div class="emoji">👀</div><h2>Spot the Difference</h2><p>Find the 3 things that are different!</p></div>
+<div class="card" data-id="x91" data-category="puzzles" onclick="showGame('x91')"><span class="num">91</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x91',this)">☆</button><div class="emoji">🔎</div><h2>Hidden Object</h2><p>Find the one different emoji!</p></div>
+<div class="card" data-id="x92" data-category="puzzles" onclick="showGame('x92')"><span class="num">92</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x92',this)">☆</button><div class="emoji">🧩</div><h2>Jigsaw Lite</h2><p>Slide the tiles to put them in order 1-8!</p></div>
+<div class="card" data-id="x93" data-category="games" onclick="showGame('x93')"><span class="num">93</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x93',this)">☆</button><div class="emoji">🎴</div><h2>Dominoes</h2><p>Draw dominoes and match the ends!</p></div>
+<div class="card" data-id="x94" data-category="games" onclick="showGame('x94')"><span class="num">94</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x94',this)">☆</button><div class="emoji">⚔️</div><h2>Card War</h2><p>High card wins the round!</p></div>
+<div class="card" data-id="x95" data-category="games" onclick="showGame('x95')"><span class="num">95</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x95',this)">☆</button><div class="emoji">♠️</div><h2>Blackjack Lite</h2><p>Get to 21 without going over!</p></div>
+<div class="card" data-id="x96" data-category="games" onclick="showGame('x96')"><span class="num">96</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x96',this)">☆</button><div class="emoji">🎲</div><h2>Poker Dice</h2><p>Roll 5 dice and make the best hand!</p></div>
+<div class="card" data-id="x97" data-category="games" onclick="showGame('x97')"><span class="num">97</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x97',this)">☆</button><div class="emoji">🎡</div><h2>Roulette</h2><p>Bet on red or black and spin the wheel!</p></div>
+<div class="card" data-id="x98" data-category="games" onclick="showGame('x98')"><span class="num">98</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x98',this)">☆</button><div class="emoji">🎫</div><h2>Bingo</h2><p>Mark your card as numbers are called!</p></div>
+<div class="card" data-id="x99" data-category="games" onclick="showGame('x99')"><span class="num">99</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x99',this)">☆</button><div class="emoji">🎟️</div><h2>Lottery Picker</h2><p>Your 6 lucky lottery numbers!</p></div>
+<div class="card" data-id="x100" data-category="fun" onclick="showGame('x100')"><span class="num">100</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x100',this)">☆</button><div class="emoji">🖖</div><h2>RPS Lizard Spock</h2><p>Rock, Paper, Scissors, Lizard, Spock!</p></div>
+<div class="card" data-id="x101" data-category="games" onclick="showGame('x101')"><span class="num">101</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x101',this)">☆</button><div class="emoji">❌</div><h2>Tic-Tac-Toe Hard</h2><p>A smarter computer that blocks and wins!</p></div>
+<div class="card" data-id="x102" data-category="games" onclick="showGame('x102')"><span class="num">102</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x102',this)">☆</button><div class="emoji">🔴</div><h2>Connect Four 2P</h2><p>Two players, pass and play!</p></div>
+<div class="card" data-id="x103" data-category="puzzles" onclick="showGame('x103')"><span class="num">103</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x103',this)">☆</button><div class="emoji">♞</div><h2>Chess Puzzles</h2><p>Solve these mate-in-one puzzles!</p></div>
+<div class="card" data-id="x104" data-category="puzzles" onclick="showGame('x104')"><span class="num">104</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x104',this)">☆</button><div class="emoji">🔤</div><h2>Word Search</h2><p>Find the hidden words in the grid!</p></div>
+<div class="card" data-id="x105" data-category="puzzles" onclick="showGame('x105')"><span class="num">105</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x105',this)">☆</button><div class="emoji">✏️</div><h2>Crossword Lite</h2><p>Fill the 3x3 word square: CAT / ATE / TEA!</p></div>
+<div class="card" data-id="x106" data-category="puzzles" onclick="showGame('x106')"><span class="num">106</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x106',this)">☆</button><div class="emoji">🔡</div><h2>Anagram Solver</h2><p>Unscramble the letters to find the word!</p></div>
+<div class="card" data-id="x107" data-category="quizzes" onclick="showGame('x107')"><span class="num">107</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x107',this)">☆</button><div class="emoji">🐝</div><h2>Spelling Bee</h2><p>Spell the word you see — no peeking at the letters!</p></div>
+<div class="card" data-id="x108" data-category="arcade" onclick="showGame('x108')"><span class="num">108</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x108',this)">☆</button><div class="emoji">🏁</div><h2>Typing Race</h2><p>Type the sentence as fast as you can!</p></div>
+<div class="card" data-id="x109" data-category="puzzles" onclick="showGame('x109')"><span class="num">109</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x109',this)">☆</button><div class="emoji">📻</div><h2>Morse Code</h2><p>Translate text to Morse, or guess the letter!</p></div>
+<div class="card" data-id="x110" data-category="tools" onclick="showGame('x110')"><span class="num">110</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x110',this)">☆</button><div class="emoji">💻</div><h2>Binary Converter</h2><p>Decimal to binary and back!</p></div>
+<div class="card" data-id="x111" data-category="puzzles" onclick="showGame('x111')"><span class="num">111</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x111',this)">☆</button><div class="emoji">🖌️</div><h2>Hex Color Game</h2><p>Guess which hex code matches the colour!</p></div>
+<div class="card" data-id="x112" data-category="tools" onclick="showGame('x112')"><span class="num">112</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x112',this)">☆</button><div class="emoji">🔢</div><h2>Prime Checker</h2><p>Is your number prime?</p></div>
+<div class="card" data-id="x113" data-category="tools" onclick="showGame('x113')"><span class="num">113</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x113',this)">☆</button><div class="emoji">🌀</div><h2>Fibonacci</h2><p>Generate the Fibonacci sequence!</p></div>
+<div class="card" data-id="x114" data-category="puzzles" onclick="showGame('x114')"><span class="num">114</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x114',this)">☆</button><div class="emoji">🥧</div><h2>Pi Memory</h2><p>How many digits of pi can you remember?</p></div>
+<div class="card" data-id="x115" data-category="tools" onclick="showGame('x115')"><span class="num">115</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x115',this)">☆</button><div class="emoji">🌍</div><h2>World Clock</h2><p>What time is it around the world?</p></div>
+<div class="card" data-id="x116" data-category="tools" onclick="showGame('x116')"><span class="num">116</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x116',this)">☆</button><div class="emoji">📅</div><h2>Calendar</h2><p>This month at a glance!</p></div>
+<div class="card" data-id="x117" data-category="tools" onclick="showGame('x117')"><span class="num">117</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x117',this)">☆</button><div class="emoji">🎂</div><h2>Age Calculator</h2><p>How old are you, exactly?</p></div>
+<div class="card" data-id="x118" data-category="tools" onclick="showGame('x118')"><span class="num">118</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x118',this)">☆</button><div class="emoji">⏳</div><h2>Date Countdown</h2><p>Count down the days to a big date!</p></div>
+<div class="card" data-id="x119" data-category="tools" onclick="showGame('x119')"><span class="num">119</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x119',this)">☆</button><div class="emoji">📋</div><h2>Habit Tracker</h2><p>Tick off today's habits!</p></div>
+<div class="card" data-id="x120" data-category="tools" onclick="showGame('x120')"><span class="num">120</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x120',this)">☆</button><div class="emoji">💧</div><h2>Water Tracker</h2><p>How many glasses of water today?</p></div>
+<div class="card" data-id="x121" data-category="tools" onclick="showGame('x121')"><span class="num">121</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x121',this)">☆</button><div class="emoji">👟</div><h2>Steps Counter Sim</h2><p>Tap to walk — can you reach 10,000 steps?</p></div>
+<div class="card" data-id="x122" data-category="tools" onclick="showGame('x122')"><span class="num">122</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x122',this)">☆</button><div class="emoji">😴</div><h2>Sleep Calculator</h2><p>What time should you wake up or go to bed?</p></div>
+<div class="card" data-id="x123" data-category="tools" onclick="showGame('x123')"><span class="num">123</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x123',this)">☆</button><div class="emoji">💪</div><h2>Workout Randomizer</h2><p>Get a random quick workout!</p></div>
+<div class="card" data-id="x124" data-category="tools" onclick="showGame('x124')"><span class="num">124</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x124',this)">☆</button><div class="emoji">🧘</div><h2>Yoga Pose</h2><p>Get a random yoga pose to try!</p></div>
+<div class="card" data-id="x125" data-category="tools" onclick="showGame('x125')"><span class="num">125</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x125',this)">☆</button><div class="emoji">🕯️</div><h2>Meditation Timer</h2><p>A calm countdown to clear your mind.</p></div>
+<div class="card" data-id="x126" data-category="tools" onclick="showGame('x126')"><span class="num">126</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x126',this)">☆</button><div class="emoji">🌬️</div><h2>Breathing Exercise</h2><p>Breathe in for 4, hold, breathe out for 4.</p></div>
+<div class="card" data-id="x127" data-category="tools" onclick="showGame('x127')"><span class="num">127</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x127',this)">☆</button><div class="emoji">😊</div><h2>Mood Tracker</h2><p>How are you feeling today?</p></div>
+<div class="card" data-id="x128" data-category="tools" onclick="showGame('x128')"><span class="num">128</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x128',this)">☆</button><div class="emoji">✍️</div><h2>Journal</h2><p>Write today's journal entry!</p></div>
+<div class="card" data-id="x129" data-category="tools" onclick="showGame('x129')"><span class="num">129</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x129',this)">☆</button><div class="emoji">💸</div><h2>Budget Tracker</h2><p>Track money in and out!</p></div>
+<div class="card" data-id="x130" data-category="tools" onclick="showGame('x130')"><span class="num">130</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x130',this)">☆</button><div class="emoji">💰</div><h2>Savings Goal</h2><p>How long until you can afford it?</p></div>
+<div class="card" data-id="x131" data-category="tools" onclick="showGame('x131')"><span class="num">131</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x131',this)">☆</button><div class="emoji">💱</div><h2>Currency Converter</h2><p>Convert between USD, EUR, GBP and JPY!</p></div>
+<div class="card" data-id="x132" data-category="tools" onclick="showGame('x132')"><span class="num">132</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x132',this)">☆</button><div class="emoji">📏</div><h2>Length Converter</h2><p>Metres, feet, cm, inches and miles!</p></div>
+<div class="card" data-id="x133" data-category="tools" onclick="showGame('x133')"><span class="num">133</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x133',this)">☆</button><div class="emoji">⚖️</div><h2>Weight Converter</h2><p>Kg, pounds and ounces!</p></div>
+<div class="card" data-id="x134" data-category="tools" onclick="showGame('x134')"><span class="num">134</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x134',this)">☆</button><div class="emoji">🌡️</div><h2>Temperature Converter</h2><p>Celsius, Fahrenheit and Kelvin!</p></div>
+<div class="card" data-id="x135" data-category="tools" onclick="showGame('x135')"><span class="num">135</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x135',this)">☆</button><div class="emoji">🚗</div><h2>Speed Converter</h2><p>Km/h, mph and m/s!</p></div>
+<div class="card" data-id="x136" data-category="tools" onclick="showGame('x136')"><span class="num">136</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x136',this)">☆</button><div class="emoji">📐</div><h2>Area Calculator</h2><p>Area of rectangles and circles!</p></div>
+<div class="card" data-id="x137" data-category="tools" onclick="showGame('x137')"><span class="num">137</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x137',this)">☆</button><div class="emoji">🧊</div><h2>Volume Calculator</h2><p>Volume of boxes and spheres!</p></div>
+<div class="card" data-id="x138" data-category="tools" onclick="showGame('x138')"><span class="num">138</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x138',this)">☆</button><div class="emoji">🏦</div><h2>Loan Calculator</h2><p>Monthly payment on a loan!</p></div>
+<div class="card" data-id="x139" data-category="tools" onclick="showGame('x139')"><span class="num">139</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x139',this)">☆</button><div class="emoji">🏠</div><h2>Mortgage Calculator</h2><p>Monthly payment on a house!</p></div>
+<div class="card" data-id="x140" data-category="tools" onclick="showGame('x140')"><span class="num">140</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x140',this)">☆</button><div class="emoji">🎓</div><h2>Grade Calculator</h2><p>What grade did you get on the test?</p></div>
+<div class="card" data-id="x141" data-category="tools" onclick="showGame('x141')"><span class="num">141</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x141',this)">☆</button><div class="emoji">📊</div><h2>GPA Calculator</h2><p>Work out your GPA from 4 grades!</p></div>
+<div class="card" data-id="x142" data-category="games" onclick="showGame('x142')"><span class="num">142</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x142',this)">☆</button><div class="emoji">🎲</div><h2>Yahtzee Lite</h2><p>Roll 5 dice, pick a scoring category!</p></div>
+<div class="card" data-id="x143" data-category="games" onclick="showGame('x143')"><span class="num">143</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x143',this)">☆</button><div class="emoji">🀄</div><h2>Domino Train</h2><p>Build a train of dominoes — match the ends!</p></div>
+<div class="card" data-id="x144" data-category="games" onclick="showGame('x144')"><span class="num">144</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x144',this)">☆</button><div class="emoji">🃏</div><h2>Solitaire Lite</h2><p>Build the 4 foundations from Ace to King!</p></div>
+<div class="card" data-id="x145" data-category="games" onclick="showGame('x145')"><span class="num">145</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x145',this)">☆</button><div class="emoji">🎴</div><h2>Uno Lite</h2><p>Match the colour or number to play your cards!</p></div>
+<div class="card" data-id="x146" data-category="games" onclick="showGame('x146')"><span class="num">146</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x146',this)">☆</button><div class="emoji">🐟</div><h2>Go Fish</h2><p>Ask the computer for a rank — make sets of 4!</p></div>
+<div class="card" data-id="x147" data-category="games" onclick="showGame('x147')"><span class="num">147</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x147',this)">☆</button><div class="emoji">⚔️</div><h2>War Card Game</h2><p>Flip cards — high card takes the pile!</p></div>
+<div class="card" data-id="x148" data-category="games" onclick="showGame('x148')"><span class="num">148</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x148',this)">☆</button><div class="emoji">👏</div><h2>Snap</h2><p>Tap SNAP when the two cards match!</p></div>
+<div class="card" data-id="x149" data-category="quizzes" onclick="showGame('x149')"><span class="num">149</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x149',this)">☆</button><div class="emoji">🧠</div><h2>Trivia Hard</h2><p>5 really hard questions!</p></div>
+<div class="card" data-id="x150" data-category="quizzes" onclick="showGame('x150')"><span class="num">150</span><button class="fav" title="Favorite this app" onclick="event.stopPropagation();toggleFav('x150',this)">☆</button><div class="emoji">👑</div><h2>Final Boss Quiz</h2><p>10 mixed hard questions — can you beat the boss?</p></div>
 </div>
 <p class="sub" style="margin-top:24px">Made for jordanIsCool-glitch/idk — 150 apps in one page</p>
 </div>
@@ -583,16 +641,16 @@ startMemory();
 /* --- 4 Pong --- */
 let pongTimer=null, pongRunning=false, pongBall, pongP1, pongP2, pongS1=0, pongS2=0;
 function stopPong(){ pongRunning=false; clearInterval(pongTimer); }
-function startPong(){ pongS1=0; pongS2=0; pongBall={x:200,y:150,dx:3,dy:2}; pongP1=125; pongP2=125; pongRunning=true; clearInterval(pongTimer); pongTimer=setInterval(pongTick,16); }
-function pongTick(){ const c=$('pongCanvas'), x=c.getContext('2d'); pongBall.x+=pongBall.dx; pongBall.y+=pongBall.dy; if(pongBall.y<8||pongBall.y>292) pongBall.dy*=-1; pongP2+=((pongBall.y-25)-pongP2)*0.06; if(pongBall.x<18 && pongBall.y>pongP1 && pongBall.y<pongP1+50) pongBall.dx=Math.abs(pongBall.dx); if(pongBall.x>382 && pongBall.y>pongP2 && pongBall.y<pongP2+50) pongBall.dx=-Math.abs(pongBall.dx); if(pongBall.x<0){ pongS2++; pongBall={x:200,y:150,dx:3,dy:2}; } if(pongBall.x>400){ pongS1++; pongBall={x:200,y:150,dx:-3,dy:2}; } $('pongScore').textContent='You '+pongS1+' — '+pongS2+' Computer'; x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#fff'; x.fillRect(10,pongP1,8,50); x.fillRect(382,pongP2,8,50); x.beginPath(); x.arc(pongBall.x,pongBall.y,7,0,7); x.fill(); if(pongS1>=5||pongS2>=5){ stopPong(); $('pongScore').textContent=(pongS1>=5?'You win! 🎉':'Computer wins!')+' Final: '+pongS1+' — '+pongS2; } }
+function startPong(){ pongS1=0; pongS2=0; pongBall={x:200,y:150,dx:3*(window.pongSpeed||1),dy:2*(window.pongSpeed||1)}; pongP1=125; pongP2=125; pongRunning=true; clearInterval(pongTimer); pongTimer=setInterval(pongTick,16); }
+function pongTick(){ const c=$('pongCanvas'), x=c.getContext('2d'); pongBall.x+=pongBall.dx; pongBall.y+=pongBall.dy; if(pongBall.y<8||pongBall.y>292) pongBall.dy*=-1; pongP2+=((pongBall.y-25)-pongP2)*0.06; if(pongBall.x<18 && pongBall.y>pongP1 && pongBall.y<pongP1+50) pongBall.dx=Math.abs(pongBall.dx); if(pongBall.x>382 && pongBall.y>pongP2 && pongBall.y<pongP2+50) pongBall.dx=-Math.abs(pongBall.dx); if(pongBall.x<0){ pongS2++; pongBall={x:200,y:150,dx:3*(window.pongSpeed||1),dy:2*(window.pongSpeed||1)}; } if(pongBall.x>400){ pongS1++; pongBall={x:200,y:150,dx:-3*(window.pongSpeed||1),dy:2*(window.pongSpeed||1)}; } $('pongScore').textContent='You '+pongS1+' — '+pongS2+' Computer'; x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#fff'; x.fillRect(10,pongP1,8,50); x.fillRect(382,pongP2,8,50); x.beginPath(); x.arc(pongBall.x,pongBall.y,7,0,7); x.fill(); if(pongS1>=5||pongS2>=5){ stopPong(); $('pongScore').textContent=(pongS1>=5?'You win! 🎉':'Computer wins!')+' Final: '+pongS1+' — '+pongS2; } }
 $('pongCanvas').addEventListener('mousemove',function(e){ const r=e.target.getBoundingClientRect(); pongP1=((e.clientY-r.top)/r.height)*300-25; });
 $('pongCanvas').addEventListener('touchmove',function(e){ const r=e.target.getBoundingClientRect(); pongP1=((e.touches[0].clientY-r.top)/r.height)*300-25; e.preventDefault(); },{passive:false});
 /* --- 5 Breakout --- */
 let breakTimer=null, breakRunning=false, breakBall, breakPaddle=170, breakBricks=[], breakScore=0, breakLives=3;
 function stopBreak(){ breakRunning=false; clearInterval(breakTimer); }
-function startBreak(){ breakScore=0; breakLives=3; breakPaddle=170; breakBricks=[]; for(let r=0;r<3;r++) for(let c=0;c<6;c++) breakBricks.push({x:c*65+10,y:r*25+30,alive:true}); breakBall={x:200,y:250,dx:3,dy:-3}; breakRunning=true; clearInterval(breakTimer); breakTimer=setInterval(breakTick,16); updateBreak(); }
+function startBreak(){ breakScore=0; breakLives=3; breakPaddle=170; breakBricks=[]; for(let r=0;r<3;r++) for(let c=0;c<6;c++) breakBricks.push({x:c*65+10,y:r*25+30,alive:true}); breakBall={x:200,y:250,dx:3*(window.breakSpeed||1),dy:-3*(window.breakSpeed||1)}; breakRunning=true; clearInterval(breakTimer); breakTimer=setInterval(breakTick,16); updateBreak(); }
 function updateBreak(){ $('breakScore').textContent='Score: '+breakScore+' • Lives: '+breakLives; }
-function breakTick(){ const c=$('breakCanvas'), x=c.getContext('2d'); breakBall.x+=breakBall.dx; breakBall.y+=breakBall.dy; if(breakBall.x<5||breakBall.x>395) breakBall.dx*=-1; if(breakBall.y<5) breakBall.dy*=-1; if(breakBall.y>280 && breakBall.x>breakPaddle && breakBall.x<breakPaddle+70) breakBall.dy=-Math.abs(breakBall.dy); breakBricks.forEach(function(b){ if(b.alive && breakBall.x>b.x && breakBall.x<b.x+60 && breakBall.y>b.y && breakBall.y<b.y+20){ b.alive=false; breakBall.dy*=-1; breakScore+=10; updateBreak(); } }); if(breakBall.y>300){ breakLives--; updateBreak(); if(breakLives<=0){ stopBreak(); $('breakScore').textContent='Game over! Score: '+breakScore; return; } breakBall={x:200,y:250,dx:3,dy:-3}; } if(breakBricks.every(function(b){return !b.alive;})){ stopBreak(); $('breakScore').textContent='You cleared them all! Score: '+breakScore+' 🎉'; } x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#f59e0b'; breakBricks.forEach(function(b){ if(b.alive) x.fillRect(b.x,b.y,60,20); }); x.fillStyle='#fff'; x.fillRect(breakPaddle,285,70,10); x.beginPath(); x.arc(breakBall.x,breakBall.y,6,0,7); x.fill(); }
+function breakTick(){ const c=$('breakCanvas'), x=c.getContext('2d'); breakBall.x+=breakBall.dx; breakBall.y+=breakBall.dy; if(breakBall.x<5||breakBall.x>395) breakBall.dx*=-1; if(breakBall.y<5) breakBall.dy*=-1; if(breakBall.y>280 && breakBall.x>breakPaddle && breakBall.x<breakPaddle+70) breakBall.dy=-Math.abs(breakBall.dy); breakBricks.forEach(function(b){ if(b.alive && breakBall.x>b.x && breakBall.x<b.x+60 && breakBall.y>b.y && breakBall.y<b.y+20){ b.alive=false; breakBall.dy*=-1; breakScore+=10; updateBreak(); } }); if(breakBall.y>300){ breakLives--; updateBreak(); if(breakLives<=0){ stopBreak(); $('breakScore').textContent='Game over! Score: '+breakScore; return; } breakBall={x:200,y:250,dx:3*(window.breakSpeed||1),dy:-3*(window.breakSpeed||1)}; } if(breakBricks.every(function(b){return !b.alive;})){ stopBreak(); $('breakScore').textContent='You cleared them all! Score: '+breakScore+' 🎉'; } x.fillStyle='#000'; x.fillRect(0,0,400,300); x.fillStyle='#f59e0b'; breakBricks.forEach(function(b){ if(b.alive) x.fillRect(b.x,b.y,60,20); }); x.fillStyle='#fff'; x.fillRect(breakPaddle,285,70,10); x.beginPath(); x.arc(breakBall.x,breakBall.y,6,0,7); x.fill(); }
 $('breakCanvas').addEventListener('mousemove',function(e){ const r=e.target.getBoundingClientRect(); breakPaddle=((e.clientX-r.left)/r.width)*400-35; });
 $('breakCanvas').addEventListener('touchmove',function(e){ const r=e.target.getBoundingClientRect(); breakPaddle=((e.touches[0].clientX-r.left)/r.width)*400-35; e.preventDefault(); },{passive:false});
 /* --- 6 Flappy --- */
@@ -600,7 +658,7 @@ let flapTimer=null, flapRunning=false, flapY=150, flapV=0, flapPipes=[], flapSco
 function stopFlap(){ flapRunning=false; clearInterval(flapTimer); }
 function startFlap(){ flapY=150; flapV=0; flapPipes=[{x:400,gap:120}]; flapScoreN=0; flapRunning=true; clearInterval(flapTimer); flapTimer=setInterval(flapTick,20); }
 function flap(){ if(flapRunning) flapV=-6; }
-function flapTick(){ const c=$('flapCanvas'), x=c.getContext('2d'); flapV+=0.35; flapY+=flapV; flapPipes.forEach(function(p){ p.x-=3; if(p.x===200) flapScoreN++; }); if(flapPipes[flapPipes.length-1].x<200) flapPipes.push({x:400,gap:80+Math.random()*80}); if(flapPipes[0].x<-60) flapPipes.shift(); $('flapScore').textContent='Score: '+flapScoreN; let dead=flapY>290||flapY<0; flapPipes.forEach(function(p){ if(200>p.x-20 && 200<p.x+50 && (flapY<p.gap || flapY>p.gap+90)) dead=true; }); if(dead){ stopFlap(); $('flapScore').textContent='Game over! Score: '+flapScoreN; } x.fillStyle='#87ceeb'; x.fillRect(0,0,400,300); x.fillStyle='#16a34a'; flapPipes.forEach(function(p){ x.fillRect(p.x,0,50,p.gap); x.fillRect(p.x,p.gap+90,50,300); }); x.fillStyle='#fbbf24'; x.beginPath(); x.arc(200,flapY,14,0,7); x.fill(); }
+function flapTick(){ const c=$('flapCanvas'), x=c.getContext('2d'); flapV+=0.35; flapY+=flapV; flapPipes.forEach(function(p){ p.x-=3*(window.flapSpeed||1); if(p.x===200) flapScoreN++; }); if(flapPipes[flapPipes.length-1].x<200) flapPipes.push({x:400,gap:80+Math.random()*80}); if(flapPipes[0].x<-60) flapPipes.shift(); $('flapScore').textContent='Score: '+flapScoreN; let dead=flapY>290||flapY<0; flapPipes.forEach(function(p){ if(200>p.x-20 && 200<p.x+50 && (flapY<p.gap || flapY>p.gap+90)) dead=true; }); if(dead){ stopFlap(); $('flapScore').textContent='Game over! Score: '+flapScoreN; } x.fillStyle='#87ceeb'; x.fillRect(0,0,400,300); x.fillStyle='#16a34a'; flapPipes.forEach(function(p){ x.fillRect(p.x,0,50,p.gap); x.fillRect(p.x,p.gap+90,50,300); }); x.fillStyle='#fbbf24'; x.beginPath(); x.arc(200,flapY,14,0,7); x.fill(); }
 $('flapCanvas').addEventListener('click',flap); $('flapCanvas').addEventListener('touchstart',function(e){ e.preventDefault(); flap(); },{passive:false});
 /* --- 7 Minesweeper --- */
 let mineGrid=[], mineOver=false, mineRevealed=0;
@@ -797,7 +855,7 @@ function lightFlip(r,c,silent){ [[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(functi
 function renderLights(){ const b=$('lightBoard'); b.innerHTML=''; lightGrid.forEach(function(row,r){ row.forEach(function(v,c){ const d=document.createElement('div'); d.className='tile'+(v?' on':''); d.textContent=v?'💡':''; d.onclick=function(){ lightFlip(r,c); }; b.appendChild(d); }); }); }
 /* --- 50 Aim Trainer --- */
 let aimTimer=null, aimHits=0, aimTime=30, aimSpawn=null;
-function startAim(){ aimHits=0; aimTime=30; $('aimScore').textContent='Hits: 0 • Time: 30s'; $('aimArea').innerHTML=''; clearInterval(aimTimer); clearInterval(aimSpawn); aimSpawn=setInterval(function(){ if(aimTime<=0) return; const t=document.createElement('div'); t.textContent='🎯'; t.style.cssText='position:absolute;font-size:2.5rem;cursor:pointer;left:'+(Math.random()*85)+'%;top:'+(Math.random()*75)+'%;'; t.onclick=function(){ aimHits++; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; t.remove(); }; $('aimArea').appendChild(t); setTimeout(function(){ if(t.parentNode) t.remove(); },1000); },800); aimTimer=regTimer(setInterval(function(){ aimTime--; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; if(aimTime<=0){ clearInterval(aimTimer); clearInterval(aimSpawn); $('aimArea').innerHTML='<div class="big">Time up! You hit '+aimHits+' targets! 🎉</div>'; } },1000)); }
+function startAim(){ aimHits=0; aimTime=30; $('aimScore').textContent='Hits: 0 • Time: 30s'; $('aimArea').innerHTML=''; clearInterval(aimTimer); clearInterval(aimSpawn); aimSpawn=setInterval(function(){ if(aimTime<=0) return; const t=document.createElement('div'); t.textContent='🎯'; t.style.cssText='position:absolute;font-size:2.5rem;cursor:pointer;left:'+(Math.random()*85)+'%;top:'+(Math.random()*75)+'%;'; t.onclick=function(){ aimHits++; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; t.remove(); }; $('aimArea').appendChild(t); setTimeout(function(){ if(t.parentNode) t.remove(); },(window.aimLifeMs||1000)); },(window.aimSpawnMs||800)); aimTimer=regTimer(setInterval(function(){ aimTime--; $('aimScore').textContent='Hits: '+aimHits+' • Time: '+aimTime+'s'; if(aimTime<=0){ clearInterval(aimTimer); clearInterval(aimSpawn); $('aimArea').innerHTML='<div class="big">Time up! You hit '+aimHits+' targets! 🎉</div>'; } },1000)); }
 initHang(); initWordle(); initC4(); initSudoku(); init2048(); initGuess(); initHL(); newScramble(); initMaze(); initCheckers(); initLights(); buildWhack();
 </script>
 <script>
@@ -1601,5 +1659,175 @@ var Q149=[['What is the smallest planet in our solar system?',['Mercury','Mars',
 var Q150=[['What is 15 x 14?',['190','210','200','220'],1],['Which planet is known as the Red Planet?',['Venus','Jupiter','Mars','Saturn'],2],['What is the capital of Japan?',['Seoul','Beijing','Tokyo','Bangkok'],2],['How many minutes are in 2.5 hours?',['120','140','150','180'],2],['What gas do plants absorb from the air?',['Oxygen','Nitrogen','Carbon dioxide','Hydrogen'],2],['Which animal is known as the King of the Jungle?',['Tiger','Lion','Elephant','Bear'],1],['What is the square root of 144?',['11','12','13','14'],1],['Which ocean is the Bermuda Triangle in?',['Pacific','Indian','Atlantic','Arctic'],2],['How many letters are in the English alphabet?',['24','25','26','27'],2],['What is H2O commonly known as?',['Salt','Water','Oxygen','Hydrogen'],1]];
 
 </script>
+
+<script>
+/* --- Upgrade: theme, sound, search, categories, favorites, best scores, difficulty --- */
+var soundOn = true;
+try { soundOn = localStorage.getItem('idk_sound') !== 'off'; } catch (e) {}
+function beep(f, d, ty) { if (!soundOn) return; try { audioTone(f, d || 0.12, ty || 'sine', 0.15); } catch (e) {} }
+function toggleSound() {
+  soundOn = !soundOn;
+  try { localStorage.setItem('idk_sound', soundOn ? 'on' : 'off'); } catch (e) {}
+  var b = $('soundBtn'); if (b) b.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off';
+  if (soundOn) beep(660, 0.1);
+}
+/* Theme: dark is default, light saved in localStorage */
+function applyTheme() {
+  var light = false;
+  try { light = localStorage.getItem('idk_theme') === 'light'; } catch (e) {}
+  document.body.classList.toggle('light', light);
+  var b = $('themeBtn'); if (b) b.textContent = light ? '🌙 Dark mode' : '☀️ Light mode';
+}
+function toggleTheme() {
+  var light = !document.body.classList.contains('light');
+  try { localStorage.setItem('idk_theme', light ? 'light' : 'dark'); } catch (e) {}
+  applyTheme(); beep(520, 0.08);
+}
+/* Favorites */
+var favs = [];
+try { favs = JSON.parse(localStorage.getItem('idk_favs') || '[]'); } catch (e) { favs = []; }
+function toggleFav(id, btn) {
+  var i = favs.indexOf(id);
+  if (i >= 0) favs.splice(i, 1); else favs.push(id);
+  try { localStorage.setItem('idk_favs', JSON.stringify(favs)); } catch (e) {}
+  if (btn) btn.textContent = favs.indexOf(id) >= 0 ? '★' : '☆';
+  beep(700, 0.08); applyFilters();
+}
+/* Search + category filter */
+var curCat = 'all';
+function setCat(c, btn) {
+  curCat = c;
+  var chips = document.querySelectorAll('.chip');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+  if (btn) btn.classList.add('active');
+  beep(600, 0.06); applyFilters();
+}
+function applyFilters() {
+  var inp = $('searchInput');
+  var q = inp ? (inp.value || '').toLowerCase().trim() : '';
+  var shown = 0;
+  var cards = document.querySelectorAll('.card');
+  for (var i = 0; i < cards.length; i++) {
+    var card = cards[i];
+    var txt = (card.textContent || '').toLowerCase();
+    var okQ = !q || txt.indexOf(q) >= 0;
+    var cat = card.getAttribute('data-category');
+    var okC = curCat === 'all' || (curCat === 'favs'
+      ? favs.indexOf(card.getAttribute('data-id')) >= 0 : cat === curCat);
+    var show = okQ && okC;
+    card.style.display = show ? '' : 'none';
+    if (show) shown++;
+  }
+  var nr = $('noResults'); if (nr) nr.classList.toggle('hidden', shown > 0);
+  var cl = $('countLine');
+  if (cl) cl.textContent = shown === 150 ? '150 games & apps — pick one!' : shown + ' of 150 apps';
+}
+function randomApp() {
+  var ids = ALL_IDS.slice();
+  var id = ids[Math.floor(Math.random() * ids.length)];
+  beep(880, 0.1); showGame(id);
+}
+/* Wrap showGame / showMenu / audioTone for click sounds + mute */
+var _origShowGame = showGame;
+showGame = function (id) { beep(600, 0.08, 'sine'); _origShowGame(id); refreshBest(); };
+var _origShowMenu = showMenu;
+showMenu = function () { beep(440, 0.07); _origShowMenu(); applyFilters(); };
+var _origAudioTone = audioTone;
+audioTone = function () { if (soundOn) _origAudioTone.apply(null, arguments); };
+/* High scores (polled once a second; only ever keeps the best) */
+function getBest(k) { try { var v = localStorage.getItem('idk_best_' + k); return v === null ? null : parseInt(v, 10); } catch (e) { return null; } }
+function setBest(k, v) { try { localStorage.setItem('idk_best_' + k, String(v)); } catch (e) {} }
+var BESTS = [
+  { app: 'snake', el: 'snakeScore', key: 'snake', unit: ' points', get: function () { return (typeof score !== 'undefined') ? score : 0; } },
+  { app: 'pong', el: 'pongScore', key: 'pong', unit: ' wins', get: function () { return (typeof pongS1 !== 'undefined') ? pongS1 : 0; } },
+  { app: 'breakout', el: 'breakScore', key: 'breakout', unit: ' points', get: function () { return (typeof breakScore !== 'undefined') ? breakScore : 0; } },
+  { app: 'flappy', el: 'flapScore', key: 'flappy', unit: ' points', get: function () { return (typeof flapScoreN !== 'undefined') ? flapScoreN : 0; } },
+  { app: 'whack', el: 'whackScore', key: 'whack', unit: ' points', get: function () { return (typeof whackScoreN !== 'undefined') ? whackScoreN : 0; } },
+  { app: 'bubble', el: 'bubScore', key: 'bubble', unit: ' popped', get: function () { return (typeof bubScoreN !== 'undefined') ? bubScoreN : 0; } },
+  { app: 'catch', el: 'catchScore', key: 'catch', unit: ' caught', get: function () { return (typeof catchCaught !== 'undefined') ? catchCaught : 0; } },
+  { app: 'aim', el: 'aimScore', key: 'aim', unit: ' hits', get: function () { return (typeof aimHits !== 'undefined') ? aimHits : 0; } },
+  { app: 'clickspeed', el: 'clickScore', key: 'click', unit: ' clicks', get: function () { return (typeof clickN !== 'undefined') ? clickN : 0; } },
+  { app: 'reaction', el: 'reactScore', key: 'reaction', unit: ' ms', better: 'low', get: function () { var m = /(\d+)\s*ms/.exec(($('reactScore') || { textContent: '' }).textContent || ''); return m ? parseInt(m[1], 10) : null; } },
+  { app: 'typing', el: 'typeScore', key: 'typing', unit: ' WPM', get: function () { var m = /(\d+)\s*WPM/.exec(($('typeScore') || { textContent: '' }).textContent || ''); return m ? parseInt(m[1], 10) : null; } }
+];
+function refreshBest() {
+  BESTS.forEach(function (b) {
+    var cur = null;
+    try { cur = b.get(); } catch (e) { cur = null; }
+    if (cur === null || cur === undefined) return;
+    var best = getBest(b.key);
+    if (best === null) { if (cur > 0) { setBest(b.key, cur); best = cur; } }
+    else if (b.better === 'low') { if (cur > 0 && cur < best) { setBest(b.key, cur); best = cur; } }
+    else if (cur > best) { setBest(b.key, cur); best = cur; }
+    var line = $('best-' + b.app);
+    if (line) line.textContent = best === null ? '🏆 Best: —' : '🏆 Best: ' + best + b.unit;
+  });
+}
+function insertAfter(ref, node) {
+  try {
+    var p = ref.parentNode;
+    if (p && p.insertBefore) { p.insertBefore(node, ref.nextSibling); return; }
+  } catch (e) {}
+  var app = ref;
+  while (app && !(app.classList && app.classList.contains && app.classList.contains('app'))) app = app.parentNode;
+  if (app && app.appendChild) app.appendChild(node);
+}
+/* Difficulty selectors (Easy / Medium / Hard) for 5 arcade games */
+window.snakeSpeed = 130; window.pongSpeed = 1; window.breakSpeed = 1; window.flapSpeed = 1;
+window.aimSpawnMs = 800; window.aimLifeMs = 1000;
+function addDiff(appId, scoreElId, opts, onPick) {
+  var sc = $(scoreElId); if (!sc) return;
+  var row = document.createElement('div'); row.className = 'diffrow';
+  var lab = document.createElement('span'); lab.textContent = 'Difficulty: '; row.appendChild(lab);
+  opts.forEach(function (o, idx) {
+    var b = document.createElement('button');
+    b.className = 'diffbtn' + (idx === 1 ? ' active' : ''); b.textContent = o.label;
+    b.onclick = function () {
+      for (var i = 0; i < row.children.length; i++) {
+        if (row.children[i].classList) row.children[i].classList.remove('active');
+      }
+      b.classList.add('active'); onPick(o.value); beep(500, 0.07);
+    };
+    row.appendChild(b);
+  });
+  insertAfter(sc, row);
+}
+addDiff('snake', 'snakeScore', [{ label: 'Easy', value: 180 }, { label: 'Medium', value: 130 }, { label: 'Hard', value: 90 }], function (v) {
+  window.snakeSpeed = v;
+  try { if (typeof snakeRunning !== 'undefined' && snakeRunning) { clearInterval(snakeTimer); snakeTimer = setInterval(tickSnake, v); } } catch (e) {}
+});
+addDiff('pong', 'pongScore', [{ label: 'Slow', value: 0.7 }, { label: 'Normal', value: 1 }, { label: 'Fast', value: 1.5 }], function (v) {
+  window.pongSpeed = v;
+  try { if (typeof pongRunning !== 'undefined' && pongRunning && pongBall) { pongBall.dx = Math.sign(pongBall.dx || 1) * 3 * v; pongBall.dy = Math.sign(pongBall.dy || 1) * 2 * v; } } catch (e) {}
+});
+addDiff('breakout', 'breakScore', [{ label: 'Slow', value: 0.8 }, { label: 'Normal', value: 1 }, { label: 'Fast', value: 1.4 }], function (v) {
+  window.breakSpeed = v;
+  try { if (typeof breakRunning !== 'undefined' && breakRunning && breakBall) { breakBall.dx = Math.sign(breakBall.dx || 1) * 3 * v; breakBall.dy = Math.sign(breakBall.dy || -1) * 3 * v; } } catch (e) {}
+});
+addDiff('flappy', 'flapScore', [{ label: 'Easy', value: 0.7 }, { label: 'Normal', value: 1 }, { label: 'Hard', value: 1.4 }], function (v) { window.flapSpeed = v; });
+addDiff('aim', 'aimScore', [{ label: 'Easy', value: [1100, 1400] }, { label: 'Normal', value: [800, 1000] }, { label: 'Hard', value: [550, 700] }], function (v) { window.aimSpawnMs = v[0]; window.aimLifeMs = v[1]; });
+/* Best-score lines under the score of each scored game */
+BESTS.forEach(function (b) {
+  var sc = $(b.el); if (!sc) return;
+  var line = document.createElement('div');
+  line.className = 'bestline'; line.id = 'best-' + b.app; line.textContent = '🏆 Best: —';
+  insertAfter(sc, line);
+});
+/* Init: theme, sound label, favorite stars, filters, best-score polling */
+applyTheme();
+(function () { var b = $('soundBtn'); if (b) b.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off'; })();
+(function () {
+  var stars = document.querySelectorAll('.fav');
+  for (var i = 0; i < stars.length; i++) {
+    var btn = stars[i];
+    var m = /toggleFav\('([^']+)'/.exec(btn.getAttribute('onclick') || '');
+    if (m && favs.indexOf(m[1]) >= 0) btn.textContent = '★';
+  }
+})();
+refreshBest();
+setInterval(refreshBest, 1000);
+applyFilters();
+</script>
+
 </body>
 </html>
